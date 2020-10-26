@@ -1,19 +1,29 @@
 <template>
-  <div id="app">
-    <nav class="navbar navbar-expand navbar-dark bg-dark">
-      <router-link to="/" class="navbar-brand">bezKoder</router-link>
-      <div class="navbar-nav mr-auto">
+  <div id="app"> 
+      
+
+      
+    <div class="container">
+      <div class="row">
+        <h1 class="mx-auto my-3">Groupomania</h1>
+      </div>
+      <nav class="navbar navbar-expand">
+      <div class="navbar-nav mx-auto">
         <li class="nav-item">
-          <router-link to="/tutorials" class="nav-link">Tutorials</router-link>
+          <router-link to="/" class="nav-link">Inscription</router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/add" class="nav-link">Add</router-link>
+          <router-link to="/login" class="nav-link">Connexion</router-link>
         </li>
       </div>
     </nav>
-
-    <div class="container mt-3">
-      <router-view />
+      <div class="row">
+        <router-view />
+        </div>
+        
+        
+      
+    
     </div>
   </div>
 </template>

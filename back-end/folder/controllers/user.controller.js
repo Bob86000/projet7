@@ -9,10 +9,9 @@ const Op = db.Sequelize.Op;
 // Create and Save a new user
 exports.signup = (req, res) => {
     if (!req.body.email||!req.body.password) {
-        res.status(400).send({
-          message: "no mail or no password!"
+      return res.status(400).send({
+          message: "Aucun email ou aucun mot de passe saisi!"
         });
-        return;
       }
     else if (validator.isEmail(req.body.email)) {
     bcrypt.hash(req.body.password, 10) 
@@ -25,69 +24,55 @@ exports.signup = (req, res) => {
       console.log(user);
       // Save user in the database
     User.create(user)
-    .then(data => {
-    res.send(data);
+    .then(() => {
+    this.login(req,res);
     })
-    .catch(err => {
-        res.status(500).send({
+      .catch(err => {
+        return res.status(500).send({
             message:
-                err.message || "Some error occurred while creating the user."
-    });
-  });      
-        
-  })
+                err.message || "Une erreur est survenue lors de création du compte."
+        });
+      });      
+    })
     .catch(error => {
-      res.status(500).json({ error : "bcrypt not working" });
+    return  res.status(500).json({ error : "erreur survenue lors de la création du mot de passe" });
     });
   }
   else {
-    res.status(400).send({
-      message: "email is not correct"
+   return res.status(400).send({
+      message: "l'email saisi utilise un format non valide"
     });
-    return;
   }
-
 }
-
-// Retrieve all users from the database.
 
 // Find a single user with an id
 exports.login = (req, res) => {
     const email = req.body.email;
     console.log('login ok');
+    console.log(req.body.password);
+    console.log(req.body.email);
+    console.log(req.body);
+
   
-    User.findOne(({ where: { email: email } }))
+    User.findOne(({ where: { email: req.body.email} }))
       .then(data => {
         console.log("user trouvé");
         if (!data) {
-          console.log(req.body.email);
-          console.log(data);
             return res.status(401).json({ error: 'Utilisateur non trouvé !' });
           }
           bcrypt.compare(req.body.password, data.password)
             .then(valid => {
-              console.log("bcrypt se lance");
               if (!valid) {
-                console.log('mdp incorrecte');
                 return res.status(401).json({ error: 'password  is not correct !' });
               }
-              console.log('mdp vérifié');
-              res.status(200).json({ message : "jswon"});
+              return res.status(200).json({ message : "utilisateur connecté"});
             })
             .catch(error => res.status(500).json({ error }));
-        res.send(data);
       })
       .catch(err => {
         console.log(req.body.password);
-                console.log(data);
-        res.status(500).send({
+        return res.status(500).send({
           message: "password  is not correct" 
         });
       });
   };
-
-
-// Delete a user with the specified id in the request
-exports.delete = (req, res) => {
-  
-};

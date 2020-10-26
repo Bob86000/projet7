@@ -7,7 +7,7 @@ export default new Router({
   mode: "history",
   routes: [
     {
-      path: "/",
+      path: "/user",
       alias: "/tutorials",
       name: "tutorials",
       component: () => import("./components/TutorialsList")
@@ -21,6 +21,17 @@ export default new Router({
       path: "/add",
       name: "add",
       component: () => import("./components/AddTutorial")
+    },
+    {
+      path: "/",
+      name: "user",
+      component: () => import("./components/Signup")
+    },
+    {
+      path: "/login",
+      name: "user",
+      component: () => import("./components/Login")
     }
+
   ]
 });
