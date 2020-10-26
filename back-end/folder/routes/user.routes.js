@@ -4,7 +4,7 @@ const usersCtrl = require("../controllers/user.controller.js");
   
     // Create a new Tutorial
     router.post("/signup", usersCtrl.signup);
-    router.get("/login", usersCtrl.login);
+    router.post("/login", usersCtrl.login);
 
     module.exports = router
   

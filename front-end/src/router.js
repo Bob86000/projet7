@@ -7,30 +7,34 @@ export default new Router({
   mode: "history",
   routes: [
     {
-      path: "/user",
-      alias: "/tutorials",
-      name: "tutorials",
-      component: () => import("./components/TutorialsList")
-    },
-    {
-      path: "/tutorials/:id",
-      name: "tutorial-details",
-      component: () => import("./components/Tutorial")
-    },
-    {
-      path: "/add",
-      name: "add",
-      component: () => import("./components/AddTutorial")
-    },
-    {
-      path: "/",
-      name: "user",
+      path: "/signup",
+      name: "signUp",
       component: () => import("./components/Signup")
     },
     {
       path: "/login",
-      name: "user",
+      name: "login",
       component: () => import("./components/Login")
+    },
+    {
+      path: "/topic",
+      alias: "/tutorials",
+      name: "allTutorials",
+      component: () => import("./components/TutorialsList")
+    },
+    {
+      path: "/topics/:id",
+      name: "oneTutorial",
+      component: () => import("./components/Tutorial")
+    },
+    {
+      path: "/addtopic",
+      name: "addTopic",
+      component: () => import("./components/AddTutorial")
+    },
+    {
+      path: "*",
+      redirect: '/signup'
     }
 
   ]

@@ -23,12 +23,12 @@
           name="description"
         />
       </div>
-
-      <button @click="saveTutorial" class="btn btn-success">Submit</button>
+      <button @click="saveTutorial" class="btn btn-success">
+      <router-link to="/" class="nav-link">succès</router-link>
+      </button>
     </div>
 
     <div v-else>
-      <h4>You submitted successfully!</h4>
       <button class="btn btn-success" @click="newTutorial">Add</button>
     </div>
   </div>

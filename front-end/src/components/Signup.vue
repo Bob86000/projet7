@@ -1,4 +1,18 @@
 <template>
+<div>
+  <div class="row">
+        <h1 class="mx-auto my-3">Groupomania</h1>
+   </div>
+  <nav v-if="!submitted" class="navbar navbar-expand">
+      <div class="navbar-nav mx-auto">
+        <li class="nav-item">
+          <router-link to="/" class="nav-link">Inscription</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/login" class="nav-link">Connexion</router-link>
+        </li>
+      </div>
+    </nav>
   <div class="submit-form">
     <div v-if="!submitted">
       <div class="form-group">
@@ -33,6 +47,7 @@
       <button class="btn btn-success" @click="newTutorial">Add</button>
     </div>
   </div>
+</div>
 </template>
 
 <script>

@@ -8,7 +8,7 @@ class UserDataService {
 
   connect(user) {
     console.log(user.email+'testmethode')
-    return http.get("users/login", user);
+    return http.post("users/login", user);
   }
 }
 
