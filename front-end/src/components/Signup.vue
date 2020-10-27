@@ -6,7 +6,7 @@
   <nav v-if="!submitted" class="navbar navbar-expand">
       <div class="navbar-nav mx-auto">
         <li class="nav-item">
-          <router-link to="/" class="nav-link">Inscription</router-link>
+          <p class="nav-link">Inscription</p>
         </li>
         <li class="nav-item">
           <router-link to="/login" class="nav-link">Connexion</router-link>
@@ -24,7 +24,7 @@
           required
           v-model="user.email"
           name="title"
-          placeholder="inscription"
+          placeholder="Inscription"
         />
       </div>
 
@@ -39,7 +39,7 @@
         />
       </div>
 
-      <button @click="saveUser" class="btn btn-success">Submit</button>
+      <router-link  :to="{name: 'home'}" @click="saveUser" class="btn btn-success">Valider</router-link>
     </div>
 
     <div v-else>

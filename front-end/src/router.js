@@ -17,14 +17,18 @@ export default new Router({
       component: () => import("./components/Login")
     },
     {
-      path: "/topic",
-      alias: "/tutorials",
-      name: "allTutorials",
-      component: () => import("./components/TutorialsList")
+    path: "/home",
+    name: "home",
+      component: () => import("./components/Home")
     },
     {
-      path: "/topics/:id",
-      name: "oneTutorial",
+      path: "/topics",
+      name: "topics",
+      component: () => import("./components/TutorialsList"),
+    },
+    {
+      path: "/topic/:id",
+      name: "oneTopic",
       component: () => import("./components/Tutorial")
     },
     {

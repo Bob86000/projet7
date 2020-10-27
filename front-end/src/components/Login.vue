@@ -1,6 +1,6 @@
 <template>
  <div>
-   <div class="col-12">
+   <div class="row">
         <h1 class="mx-auto my-3">Groupomania</h1>
    </div>
   <nav v-if="!submitted" class="navbar navbar-expand">
@@ -9,7 +9,7 @@
           <router-link to="/" class="nav-link">Inscription</router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/login" class="nav-link">Connexion</router-link>
+          <p class="nav-link">Connexion</p>
         </li>
       </div>
     </nav>
@@ -24,7 +24,7 @@
           required
           v-model="user.email"
           name="title"
-          placeholder="connexion"
+          placeholder="Connexion"
         />
       </div>
 
@@ -38,8 +38,7 @@
           name="description"
         />
       </div>
-
-      <router-link  to="/topic" @click="connectUser" class="btn btn-success" tag="button">Submit</router-link>
+      <router-link  :to="{name: 'home'}" @click="connectUser" class="btn btn-success" tag="button">Valider</router-link>
     </div>
 
     <div v-else>
