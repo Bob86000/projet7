@@ -23,6 +23,31 @@ db.users = require("./user.model.js")(sequelize, Sequelize);
 db.topics = require("./topic.model.js")(sequelize, Sequelize);
 db.comments = require("./comment.model.js")(sequelize, Sequelize);
 
+// add primary-key users in topics table 
 
+db.users.hasOne(db.topics, {
+  foreignKey: {
+  allowNull: false
+},
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+// add primary-key topics and users in comment table 
+
+db.topics.hasOne(db.comments, {
+  foreignKey: {
+    allowNull: false
+  },
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+db.users.hasOne(db.comments, {
+  foreignKey: {
+    allowNull: false
+  },
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
 
 module.exports = db;

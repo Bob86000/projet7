@@ -4,10 +4,10 @@ const router = express.Router();
 const topicsCtrl = require("../controllers/topic.controller.js");
   
     // Create a new Tutorial
-    router.post("/", topicsCtrl.create);
+    router.post("/create", topicsCtrl.create);
   
     // Retrieve all Topics
-    router.get("/", topicsCtrl.findAll);
+    router.get("/all", topicsCtrl.findAll);
   
     // Retrieve all published Topics
     router.get("/published", topicsCtrl.findAllPublished);

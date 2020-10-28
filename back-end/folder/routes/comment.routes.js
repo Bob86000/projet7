@@ -3,7 +3,7 @@ const router = express.Router();
 const commentsCtrl = require("../controllers/comment.controller.js");
   
   // Create a new Comment
-  router.post("/", commentsCtrl.create);
+  router.post("/create", commentsCtrl.create);
   
   // Retrieve all comments
  // router.get("/", commentsCtrl.findAll);

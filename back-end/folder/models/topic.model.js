@@ -8,10 +8,19 @@ module.exports = (sequelize, Sequelize) => {
       },
       published: {
         type: Sequelize.BOOLEAN
+      },
+      likes: {
+        type: Sequelize.INTEGER
+      },
+      dislikes: {
+        type: Sequelize.INTEGER
+      },
+      usersLiked: {
+        type: Sequelize.TEXT
+      },
+      usersDisliked: {
+        type: Sequelize.TEXT
       }
-      /*userID: {
-        type: Sequelize.STRING
-      }*/
     });
   
     return Topic;

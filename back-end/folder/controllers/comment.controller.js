@@ -5,7 +5,7 @@ const Op = db.Sequelize.Op;
 // Create and Save a new Tutorial
 exports.create = (req, res) => {
     // Validate request
-    if (!req.body.title) {
+    if (!req.body.description) {
       res.status(400).send({
         message: "can not be empty!"
       });
@@ -13,11 +13,39 @@ exports.create = (req, res) => {
     }
     // Create a Tutorial
     const comment = {
-        texte: req.body.title,
-        multimedia: req.body.description,
+        description: req.body.description,
+        imageUrl: req.body.imageUrl,
         published: req.body.published ? req.body.published : false,
-        title: req.body.title
+        likes: req.body.likes,
+        dislikes: req.body.dislikes,
+        usersLiked: req.body.usersLiked,
+        usersDisliked: req.body.usersDisliked,
+        userId: req.body.userId,
+        topicId: req.body.topicId
       };
+
+      /*{"description": "testcommentpostman1",
+        "imageUrl": "testcommentpostman1",
+        "published": "true",
+        "likes": "0",
+        "dislikes": "0",
+        "usersLiked": "paultestpostman1",
+        "usersDisliked": "jeantestpostman1",
+        "userId": "1",
+        "topicId": "1"}
+        
+        {"description": "testcommentpostman2",
+        "imageUrl": "testcommentpostman2",
+        "published": "true",
+        "likes": "0",
+        "dislikes": "0",
+        "usersLiked": "raoultestpostman2",
+        "usersDisliked": "bobtestpostman2",
+        "userId": "2",
+        "topicId": "2"}
+        
+        */
+
     // Save Tutorial in the database
     Comment.create(comment)
     .then(data => {

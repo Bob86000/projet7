@@ -1,17 +1,26 @@
 module.exports = (sequelize, Sequelize) => {
     const Comment = sequelize.define("comment", {
-      texte: {
+      description: {
         type: Sequelize.STRING
       },
-      multimedia: {
+      imageUrl: {
         type: Sequelize.STRING
       },
       published: {
         type: Sequelize.BOOLEAN
       },
-      title : {
-      type: Sequelize.STRING
-    }
+      likes: {
+        type: Sequelize.INTEGER
+      },
+      dislikes: {
+        type: Sequelize.INTEGER
+      },
+      usersLiked: {
+        type: Sequelize.TEXT
+      },
+      usersDisliked: {
+        type: Sequelize.TEXT
+      }
     });
   
     return Comment;
