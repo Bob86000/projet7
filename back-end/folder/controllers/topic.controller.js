@@ -1,30 +1,11 @@
 const db = require("../models");
 const Topic = db.topics;
 const Op = db.Sequelize.Op;
+const fs = require('fs');
 
-// Create and Save a new Topic
-exports.create = (req, res) => {
-    // Validate request
-    if (!req.body.title) {
-      res.status(400).send({
-        message: "can not be empty!"
-      });
-      return;
-    }
-    // Create a Topic
-    const topic = {
-        title: req.body.title,
-        description: req.body.description,
-        published: req.body.published ? req.body.published : false,
-        likes: req.body.likes,
-        dislikes: req.body.dislikes,
-        usersLiked: req.body.usersLiked,
-        usersDisliked: req.body.usersDisliked,
-        userId: req.body.userId// il faudra mettre un cryptage sur la valeur de userID
-       // commentCount: 0*/
-      };
 
-      /*test postman
+
+  /*modele requete postman pour .create
 
       {"title": "testpostman1",
         "description": "descriptiontestpostman1",
@@ -38,21 +19,145 @@ exports.create = (req, res) => {
         
       */
 
-    // Save Topic in the database
+// Create and Save a new Topic
+
+exports.create = (req, res) => {
+    // Validate request
+    if (!req.body.title) {
+      return res.status(400).send({ message: "le titre est obligatoire"});
+    }
+    // un champs userId supplémentaire doit etre apporté dans la requete
+    const topicObject = req.body.topic;
+    const topic = {
+      ...topicObject,
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+      likes: 0,
+      dislikes: 0,
+      usersLiked : "",
+      usersDisliked: ""
+    };
+         // Save Topic in the database
     Topic.create(topic)
     .then(data => {
     res.send(data);
     })
-    .catch(err => {
-        res.status(500).send({
-            message:
-                err.message || "Erreur lors de la creation de la publication."
-    });
-  });
+    .catch(() => { return res.status(500).json({ error: "erreur au niveau du modèle" })} );
 };
 
+
+/* modele requete postman pour .modifyTopicsLike
+{
+  put http://localhost:8080/api/topics/create/1
+
+  {"userId": 1,
+  "likes": 1}
+}
+
+
+*/
+exports.modifyTopicsLikes = (req, res) => {
+
+      Topic.findOne(({ where: { id: req.params.id} }))
+     .then(topic => {
+      if (topic == null)
+       {
+         return res.status(500).send({ message: "Il n'y a aucune publication qui correspond à cette requete" })
+       }
+        // modify number likes and dislikes
+        let likes = topic.likes;
+        let dislike = topic.dislikes;
+
+        // transform DB text model in array model 
+
+        let newUsersId = req.body.userId;
+        let usersLiked = topic.usersLiked.split(" ");
+        let usersDisliked = topic.usersDisliked.split(" ");
+        if ( usersLiked[0] ==""){ usersLiked.splice(0,1)}
+        if ( usersDisliked[0] ==""){ usersDisliked.splice(0,1)}
+        // search if userslikes or usersdislike already exist
+        let findUsersLiked = usersLiked.find((user) => user == req.body.userId);
+        let findUsersDisliked = usersDisliked.find((user) => user == req.body.userId);
+        if (req.body.like == 1 && findUsersLiked === undefined) {
+          if ( req.body.like == 1 && findUsersDisliked !== undefined ) {
+            return  res.status(500).send({ message: "You already give a dislike if u want give a like then cancel your dislike first" });
+          }
+          topic.likes++;
+          let newLikes = topic.likes;
+          usersLiked.push(newUsersId);
+          let newUsersLiked = usersLiked.join(" ");
+          Topic.update({ likes : newLikes, usersLiked : newUsersLiked }, {
+            where: { id: req.params.id  }})
+          .then(()=> {
+              return  res.status(201).send({ message: 'Les likes de la publication ont été modifié avec succès'});
+            })
+          .catch(err => {
+            return  res.status(500).send({ error : "Echec lors de la modification des likes de la publication"});
+            })
+        }
+        else if (req.body.like == 0) {
+            if (findUsersLiked !== undefined) {
+            topic.likes--;
+            let newLikes = topic.likes;
+            let indexToDelete = usersLiked.indexOf(req.body.userId);
+            usersLiked.splice(indexToDelete,1);
+            let newUsersLiked = usersLiked.join(" ");
+            Topic.update({ likes : newLikes, usersLiked : newUsersLiked }, {
+              where: { id: req.params.id  }})
+            .then(() => {
+              return  res.status(201).send({ message: 'Les likes de la publication ont été modifié avec succès'});
+              })
+            .catch(err => {
+              return  res.status(500).send({ error: "Echec lors de la modification des likes de la publication"});
+              })
+            }
+            else if (findUsersDisliked !== undefined) {
+              topic.dislikes--;
+              let newDislikes = topic.dislikes;
+              let indexToDelete = usersDisliked.indexOf(req.body.userId);
+              usersDisliked.splice(indexToDelete,1);
+              let newUsersDisliked = usersDisliked.join(" ");
+              Topic.update({ dislikes : newDislikes, usersDisliked : newUsersDisliked }, { where: { id: req.params.id  }})
+              .then(num => {
+                return  res.status(201).send({ message: 'Les likes de la publication ont été modifié avec succès'});
+              })
+            .catch(err => {
+              return  res.status(500).send({ error : "Echec lors de la modification des likes de la publication"});
+              })
+            }
+            else { return res.status(500).send({ message: "You try to give 2 like or dislike but it's forbidden"})}
+          }
+        else if (req.body.like == -1 && findUsersDisliked === undefined) {
+          if ( req.body.like == -1 && findUsersLiked !== undefined ) {
+            return  res.status(500).send({ message: "You already give a like if u want give a dislike then cancel your dislike first" });
+          }
+          topic.dislikes++;
+          let newDislikes = topic.dislikes;
+          usersDisliked.push(newUsersId);
+          let newUsersDisliked = usersDisliked.join(" ");
+          Topic.update({ dislikes : newDislikes, usersDisliked : newUsersDisliked }, { where: { id: req.params.id  }})
+          .then(num => {
+            return  res.status(201).send({ message: 'Les likes de la publication ont été modifié avec succès'});
+          })
+        .catch(err => {
+          return  res.status(500).send({ error: "Echec lors de la modification des likes de la publication"});
+          })
+        }
+        else { return res.status(500).send({ message: "Vous essayer d'effectuer deux fois la même action et c'est interdit"})}
+      })
+  .catch((error) => { return res.status(500).json({ error: "erreur au niveau du modèle" })}) 
+  }
+
+
+
+/* modele requete postman pour .findAll
+{
+  get http://localhost:8080/api/topics/all
+
+}*/
+
 // Retrieve all Topics from the database.
-exports.findAll = exports.findAll = (req, res) => {
+
+exports.findAll = (req, res) => {
     const title = req.query.title;
     var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
   
@@ -68,13 +173,21 @@ exports.findAll = exports.findAll = (req, res) => {
       });
   };
 
+/* modele requete postman pour .findOne
+{
+  get http://localhost:8080/api/topics/1
+
+}*/
+
 // Find a single Topic with an id
 exports.findOne = (req, res) => {
     const id = req.params.id;
   
     Topic.findByPk(id)
       .then(data => {
+        if (data === null) { return res.status(500).send({ message: "cette page n'existe pas"})}
         res.send(data);
+      
       })
       .catch(err => {
         res.status(500).send({
@@ -85,25 +198,29 @@ exports.findOne = (req, res) => {
 
 // Update a Topic by the id in the request
 exports.update = (req, res) => {
-    const id = req.params.id;
+// Verify if origin request come from topic OP
+ /* if (req.auth.id != data.userId) {
+    return res.status(400).send({
+      message: "Vous n'êtes pas l'auteur de la publication"
+    });
+  }*/
+   const id = req.params.id;
+
+    const topicObject = req.file ?
+    {
+        ...JSON.parse(req.body.topic),
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...req.body };
   
-    Topic.update(req.body, {
+    Comment.update(topicObject, {
       where: { id: id }
     })
-      .then(num => {
-        if (num == 1) {
-          res.send({
-            message: "la publicationa  été modifié avec succès."
-          });
-        } else {
-          res.send({
-            message: `Echec lors de la modification de la publication avec un id=${id}. La publication n'a peut etre pas été trouvé ou le req.body est vide!`
-          });
-        }
-      })
+      .then( () => { 
+        res.status(200).json({ message: "objet modifié !" });
+        })
       .catch(err => {
         res.status(500).send({
-          message: "Erreur lors de la modification de la publication avec un id=" + id
+          message: "Error updating Topic with id=" + id
         });
       });
   };

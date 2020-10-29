@@ -5,7 +5,17 @@ const db = require("../models");
 const User = db.users;
 const Op = db.Sequelize.Op;
 
+/* modele requete pour postman
+post http://localhost:8080/api/users/signup
 
+{ "email": "23@gmail.com",
+"password": "1234"}
+
+{ "email": "46@gmail.com",
+"password": "14"}
+
+
+*/
 // Create and Save a new user
 exports.signup = (req, res) => {
     if (!req.body.email||!req.body.password) {
@@ -48,12 +58,8 @@ exports.signup = (req, res) => {
 // Find a single user with an id
 exports.login = (req, res) => {
     const email = req.body.email;
-    console.log('login ok');
-    console.log(req.body.password);
-    console.log(req.body.email);
-    console.log(req.body);
 
-  
+    
     User.findOne(({ where: { email: req.body.email} }))
       .then(data => {
         console.log("user trouvé");

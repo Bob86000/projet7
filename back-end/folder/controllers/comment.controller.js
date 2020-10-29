@@ -1,6 +1,7 @@
 const db = require("../models");
 const Comment = db.comments;
 const Op = db.Sequelize.Op;
+const fs = require('fs');
 
 // Create and Save a new Tutorial
 exports.create = (req, res) => {
@@ -11,31 +12,43 @@ exports.create = (req, res) => {
       });
       return;
     }
-    // Create a Tutorial
-    const comment = {
-        description: req.body.description,
-        imageUrl: req.body.imageUrl,
-        published: req.body.published ? req.body.published : false,
-        likes: req.body.likes,
-        dislikes: req.body.dislikes,
-        usersLiked: req.body.usersLiked,
-        usersDisliked: req.body.usersDisliked,
-        userId: req.body.userId,
-        topicId: req.body.topicId
-      };
+    // Create a Comment
 
-      /*{"description": "testcommentpostman1",
+      // un champs userId supplémentaire doit etre apporté dans la requete
+      // un champs topicId supplémentaire doit etre apporté dans la requete
+      const comment = req.file ?
+      {
+          ...JSON.parse(req.body.comment),
+          imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+          likes: 0,
+        dislikes: 0,
+        usersLiked : "",
+        usersDisliked: ""
+      } : { ...req.body,
+        likes: 0,
+      dislikes: 0,
+      usersLiked : "",
+      usersDisliked: "" 
+      };
+      // ancien code sans prise en charge de
+     /* const commentObject = req.body;
+    const comment = {
+      ...commentObject,
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+      likes: 0,
+      dislikes: 0,
+      usersLiked : "",
+      usersDisliked: ""
+    }; */
+
+      /* test requete postman 
+      post  http://localhost:8080/api/comments/create
+      
+      {"description": "testcommentpostman1",
         "imageUrl": "testcommentpostman1",
-        "published": "true",
-        "likes": "0",
-        "dislikes": "0",
-        "usersLiked": "paultestpostman1",
-        "usersDisliked": "jeantestpostman1",
-        "userId": "1",
-        "topicId": "1"}
+        "published": "true"}
         
         {"description": "testcommentpostman2",
-        "imageUrl": "testcommentpostman2",
         "published": "true",
         "likes": "0",
         "dislikes": "0",
@@ -59,8 +72,122 @@ exports.create = (req, res) => {
   });
 };
 
+
+/* modele requete postman
+{
+  put http://localhost:8080/api/comments/create/2
+
+  {"userId": "1",
+  "like": "1"}
+}
+
+
+*/
+exports.modifyCommentsLikes = (req, res) => {
+
+  Comment.findOne(({ where: { id: req.params.id} }))
+     .then(comment => {
+       if (comment == null)
+       {
+         return res.status(500).send({ message: "Il n'y a aucun commentaire qui correspond à cette requete" })
+       }
+        // modify number likes and dislikes
+        let likes = comment.likes;
+        let dislike = comment.dislikes;
+        
+
+        // transform DB text model in array model 
+
+        let newUsersId = req.body.userId;
+        let usersLiked = comment.usersLiked.split(" ");
+        let usersDisliked = comment.usersDisliked.split(" ");
+        if ( usersLiked[0] ==""){ usersLiked.splice(0,1)}
+        if ( usersDisliked[0] ==""){ usersDisliked.splice(0,1)}
+        // search if userslikes or usersdislike already exist
+        let findUsersLiked = usersLiked.find((user) => user == req.body.userId);
+        let findUsersDisliked = usersDisliked.find((user) => user == req.body.userId);
+        if (req.body.like == 1 && findUsersLiked === undefined) {
+          if ( req.body.like == 1 && findUsersDisliked !== undefined ) {
+            return  res.status(500).send({ message: "You already give a dislike if u want give a like then cancel your dislike first" });
+          }
+          comment.likes++;
+          let newLikes = comment.likes;
+          usersLiked.push(newUsersId);
+          let newUsersLiked = usersLiked.join(" ");
+          Comment.update({ likes : newLikes, usersLiked : newUsersLiked }, {
+            where: { id: req.params.id  }
+          })
+          .then((update) => {
+            return  res.status(201).send({ message: 'Les likes des commentaires ont été modifié avec succès'});
+          }) 
+          .catch(err => {
+            return  res.status(500).send({ error: "Echec lors de la modification des likes de la publication"});
+            })
+        }
+        else if (req.body.like == 0) {
+            if (findUsersLiked !== undefined) {
+              comment.likes--;
+            let newLikes = comment.likes;
+            let indexToDelete = usersLiked.indexOf(req.body.userId);
+            usersLiked.splice(indexToDelete,1);
+            let newUsersLiked = usersLiked.join(" ");
+            Comment.update({ likes : newLikes, usersLiked : newUsersLiked }, {
+              where: { id: req.params.id  }
+            })
+            .then((update) => {
+              return  res.status(201).send({ message: 'Les likes des commentaires ont été modifié avec succès'});
+            }) 
+            .catch(err => {
+              return  res.status(500).send({ error: "Echec lors de la modification des likes de la publication"});
+              })
+            }
+            else if (findUsersDisliked !== undefined) {
+              comment.dislikes--;
+              let newDislikes = comment.dislikes;
+              let indexToDelete = usersDisliked.indexOf(req.body.userId);
+              usersDisliked.splice(indexToDelete,1);
+              let newUsersDisliked = usersDisliked.join(" ");
+              Comment.update({ dislikes : newDislikes, usersDisliked : newUsersDisliked }, { where: { id: req.params.id  }})
+              .then(() => {
+                return  res.status(201).send({ message: 'Les likes des commentaires ont été modifié avec succès'});
+              }) 
+            .catch(err => {
+              return  res.status(500).send({ error: "Echec lors de la modification des likes des commentaires"});
+              })
+            }
+            else { return res.status(500).send({ message: "you try to give 2 like or dislike and it's forbidden"})}
+          }
+        else if (req.body.like == -1 && findUsersDisliked === undefined) {
+          if ( req.body.like == -1 && findUsersLiked !== undefined ) {
+            return  res.status(500).send({ message: "You already give a like if u want give a dislike then cancel your dislike first" });
+          }
+          comment.dislikes++;
+          let newDislikes = comment.dislikes;
+          usersDisliked.push(newUsersId);
+          let newUsersDisliked = usersDisliked.join(" ");
+          Comment.update({ dislikes : newDislikes, usersDisliked : newUsersDisliked }, { where: { id: req.params.id  }})
+          .then(() => {
+              return  res.status(201).send({ message: "like success." });
+          }) 
+        .catch(err => {
+          return  res.status(500).send({ error: "Echec lors de la modification des likes des commentaires"});
+          })
+        }
+        else { return res.status(500).send({ message: "you try to give 2 like or dislike and it's forbidden"})}
+      })
+  .catch((error) => { return res.status(500).json({ error: "erreur au niveau du modèle" })})
+  }
+
+
+/* modele requete postman pour .findAll
+{
+  get http://localhost:8080/api/comments/all
+
+}*/
+
 // Retrieve all Tutorials from the database.
-/*exports.findAll = exports.findAll = (req, res) => {
+
+exports.findAll = (req, res) => {
     const title = req.query.title;
     var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
   
@@ -74,28 +201,50 @@ exports.create = (req, res) => {
             err.message || "Some error occurred while retrieving tutorials."
         });
       });
-  };*/
+  };
+
+/* modele requete postman pour .findOne
+{
+  get http://localhost:8080/api/comments/1
+
+}*/
+
+// Find a single Topic with an id
+exports.findOne = (req, res) => {
+  const id = req.params.id;
+
+  Topic.findByPk(id)
+    .then(data => {
+      if (data === null) { return res.status(500).send({ message: "cette page n'existe pas"})}
+      res.send(data);
+    
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Erreur lors de la recherche de la publication avec un id = " + id
+      });
+    });
+};
+
 // Update a Tutorial by the id in the request
-exports.update = (req, res) => {
+exports.Commentupdate = (req, res) => {
     const id = req.params.id;
+
+    const commentObject = req.file ?
+    {
+        ...JSON.parse(req.body.comment),
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...req.body };
   
-    Comment.update(req.body, {
+    Comment.update(commentObject, {
       where: { id: id }
     })
-      .then(num => {
-        if (num == 1) {
-          res.send({
-            message: "Tutorial was updated successfully."
-          });
-        } else {
-          res.send({
-            message: `Cannot update Tutorial with id=${id}. Maybe Tutorial was not found or req.body is empty!`
-          });
-        }
-      })
+      .then( () => { 
+        res.status(200).json({ message: "objet modifié !" });
+        })
       .catch(err => {
         res.status(500).send({
-          message: "Error updating Tutorial with id=" + id
+          message: "Error updating comment with id=" + id
         });
       });
   };
