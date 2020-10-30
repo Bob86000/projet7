@@ -9,10 +9,10 @@
   <nav class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="#">Les publications<span class="sr-only">(current)</span></a>
+        <router-link class="nav-link" :to="{name:'topics'}">Les publications<span class="sr-only">(current)</span></router-link>
       </li>
       <li class="nav-item active">
-        <a class="nav-link" href="#">Les commentaires</a>
+        <router-link class="nav-link" :to="{name: 'home'}">Les commentaires</router-link>
       </li>
     </ul>
     <form class="form-inline my-2 my-lg-0">
@@ -22,51 +22,35 @@
   </nav>
 </header>
 <main>
-    <div class="row header-main">
-        4 Bloc affiché
-    </div>
+    <router-view  name="sectionHeader"></router-view>
 <section class="row">
+    
              <article class="col-8">
-                 1 bloc publication + commentaire masqué
+                
+                <router-view  name="article"></router-view>
+                
              </article>
 </section>
-         <aside class="iu"></aside>
+         <aside class="iu"><router-view  name="aside"></router-view></aside>
 </main>
 <footer class="iu">bloc footer</footer> 
 </div>
 </template>
 
 <script>
-import UserDataService from "../services/UserDataService";
 
 export default {
-  name: "login",
+ name: "Topic-list",
   data() {
     return {
-      user: {
-        email: '',
-        password: ''
-      },
-      submitted: false
+      topics: [],
+      comments: [],
+      currentTutorial: null,
+      currentIndex: -1,
+      title: ""
     };
   },
   methods: {
-    connectUser() {
-      var user = {
-        email: this.user.email,
-        password: this.user.password
-      };
-
-
-       UserDataService.connect(user)
-        .then(response => {
-          console.log(response.data);
-          this.submitted = true;
-        })
-        .catch(e => {
-          console.log(e);
-        });
-    },
   }
 };
 </script>

@@ -1,32 +1,42 @@
 import http from "../http-common";
 
 class TutorialDataService {
+
+
+  create(data) {
+    return http.post("/topics/create", data);
+  }
+
+  updatelike(id,data){
+    return http.put(`/topics/${id}`, data);
+  }
+
   getAll() {
-    return http.get("/tutorials");
+    return http.get("/topics/all");
+  }
+
+  getAllPublished(){
+    return http.get(`/topics/published`);
   }
 
   get(id) {
-    return http.get(`/tutorials/${id}`);
-  }
-
-  create(data) {
-    return http.post("/tutorials", data);
+    return http.get(`/topics/${id}`);
   }
 
   update(id, data) {
-    return http.put(`/tutorials/${id}`, data);
+    return http.put(`/topics/${id}`, data);
   }
 
   delete(id) {
-    return http.delete(`/tutorials/${id}`);
+    return http.delete(`/topics/${id}`);
   }
 
   deleteAll() {
-    return http.delete(`/tutorials`);
+    return http.delete(`/topics/`);
   }
 
   findByTitle(title) {
-    return http.get(`/tutorials?title=${title}`);
+    return http.get(`/topics/all?title=${title}`);
   }
 }
 

@@ -7,14 +7,9 @@ export default new Router({
   mode: "history",
   routes: [
     {
-      path: "/signup",
-      name: "signUp",
-      component: () => import("./components/Signup")
-    },
-    {
-      path: "/login",
-      name: "login",
-      component: () => import("./components/Login")
+      path: "/",
+      name: "user",
+        component: () => import("./components/User")
     },
     {
     path: "/home",
@@ -24,7 +19,7 @@ export default new Router({
     {
       path: "/topics",
       name: "topics",
-      component: () => import("./components/TutorialsList"),
+      component: () => import("./components/TutorialsList")
     },
     {
       path: "/topic/:id",
@@ -38,7 +33,7 @@ export default new Router({
     },
     {
       path: "*",
-      redirect: '/signup'
+      redirect: '/'
     }
 
   ]

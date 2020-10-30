@@ -108,9 +108,11 @@ export default {
       TutorialDataService.findByTitle(this.title)
         .then(response => {
           this.tutorials = response.data;
+          console.log(this.tutorials);
           console.log(response.data);
         })
         .catch(e => {
+          console.log(this.title + 'hello')
           console.log(e);
         });
     }

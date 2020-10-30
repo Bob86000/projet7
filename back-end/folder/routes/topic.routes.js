@@ -10,7 +10,10 @@ const verify = require("../middleware/user-Id-security");
     router.put("/create/:id", verify.SavedUser, topicsCtrl.modifyTopicsLikes);
   
     // Retrieve all Topics
-    router.get("/all", topicsCtrl.findAll);
+    router.get("/alltitle", topicsCtrl.findAllTitleTopic);
+
+     // Retrieve all Topics
+     router.get("/all", topicsCtrl.findAllTopic);
   
     // Retrieve all published Topics
     router.get("/published", topicsCtrl.findAllPublished);

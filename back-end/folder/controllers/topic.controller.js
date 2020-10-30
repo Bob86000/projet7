@@ -7,6 +7,8 @@ const fs = require('fs');
 
   /*modele requete postman pour .create
 
+  POST http://localhost:8080/api/topics/create
+
       {"title": "testpostman1",
         "description": "descriptiontestpostman1",
         "published": "true",
@@ -23,19 +25,25 @@ const fs = require('fs');
 
 exports.create = (req, res) => {
     // Validate request
+    console.log(req.body);
     if (!req.body.title) {
       return res.status(400).send({ message: "le titre est obligatoire"});
     }
     // un champs userId supplémentaire doit etre apporté dans la requete
-    const topicObject = req.body.topic;
-    const topic = {
-      ...topicObject,
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-      likes: 0,
+    const topic = req.file ?
+      {
+          ...JSON.parse(req.body.comment),
+          imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+          likes: 0,
+        dislikes: 0,
+        usersLiked : "",
+        usersDisliked: ""
+      } : { ...req.body,
+        likes: 0,
       dislikes: 0,
       usersLiked : "",
-      usersDisliked: ""
-    };
+      usersDisliked: "" 
+      };
          // Save Topic in the database
     Topic.create(topic)
     .then(data => {
@@ -157,21 +165,38 @@ exports.modifyTopicsLikes = (req, res) => {
 
 // Retrieve all Topics from the database.
 
-exports.findAll = (req, res) => {
+exports.findAllTitleTopic = (req, res) => {
     const title = req.query.title;
     var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
-  
+    if (condition == null) {
+      return res.status(500).send({ message : "erreur lors de la requete"})
+    }
     Topic.findAll({ where: condition })
       .then(data => {
-        res.send(data);
+       return res.send(data);
       })
       .catch(err => {
-        res.status(500).send({
+      return  res.status(500).send({
           message:
             err.message || "Erreur lors de la recherche des publications."
         });
       });
   };
+
+  exports.findAllTopic = (req, res) => {
+  
+    Topic.findAll({order : [ ['id', 'DESC'] ]})
+      .then(data => {
+      return  res.send(data);
+      })
+      .catch(err => {
+      return  res.status(500).send({
+          message:
+            err.message || "Erreur lors de la recherche des publications."
+        });
+      });
+  };
+
 
 /* modele requete postman pour .findOne
 {
@@ -186,11 +211,11 @@ exports.findOne = (req, res) => {
     Topic.findByPk(id)
       .then(data => {
         if (data === null) { return res.status(500).send({ message: "cette page n'existe pas"})}
-        res.send(data);
+        return res.send(data);
       
       })
       .catch(err => {
-        res.status(500).send({
+      return  res.status(500).send({
           message: "Erreur lors de la recherche de la publication avec un id = " + id
         });
       });
@@ -205,6 +230,9 @@ exports.update = (req, res) => {
     });
   }*/
    const id = req.params.id;
+   if (id == null) {
+    return res.status(500).send({ message : "erreur lors de la requete"})
+  }
 
     const topicObject = req.file ?
     {
@@ -232,17 +260,9 @@ exports.delete = (req, res) => {
     Topic.destroy({
       where: { id: id }
     })
-      .then(num => {
-        if (num == 1) {
-          res.send({
-            message: "La publication a été supprimer avec succès!"
-          });
-        } else {
-          res.send({
-            message: `Impossible de supprimer la publication avec un id=${id}. La publication n'a peut etre pas été trouvé!`
-          });
-        }
-      })
+      .then(() => {
+        res.status(201).json({ message: "objet supprimé !" });
+          })
       .catch(err => {
         res.status(500).send({
           message: "Impossible de supprimer la publication avec un id=" + id

@@ -24,6 +24,7 @@ exports.signup = (req, res) => {
         });
       }
     else if (validator.isEmail(req.body.email)) {
+      console.log("bonne route");
     bcrypt.hash(req.body.password, 10) 
     .then(hash=> {
         // Create a user
@@ -59,7 +60,7 @@ exports.signup = (req, res) => {
 exports.login = (req, res) => {
     const email = req.body.email;
 
-    
+
     User.findOne(({ where: { email: req.body.email} }))
       .then(data => {
         console.log("user trouvé");
@@ -79,6 +80,28 @@ exports.login = (req, res) => {
         console.log(req.body.password);
         return res.status(500).send({
           message: "password  is not correct" 
+        });
+      });
+  };
+
+  /* modele requete pour postman
+DELETE http://localhost:8080/api/users/1
+
+{ "email": "23@gmail.com",
+"password": "1234"}*/
+
+  exports.delete = (req, res) => {
+    const id = req.params.id;
+  
+    User.destroy({
+      where: { id: id }
+    })
+      .then(() => {
+        res.status(201).json({ message: "objet supprimé !" });
+          })
+      .catch(err => {
+        res.status(500).send({
+          message: "Impossible de supprimer la publication avec un id=" + id
         });
       });
   };

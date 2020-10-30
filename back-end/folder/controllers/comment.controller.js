@@ -6,12 +6,12 @@ const fs = require('fs');
 // Create and Save a new Tutorial
 exports.create = (req, res) => {
     // Validate request
-    if (!req.body.description) {
+    /*if (!req.body.description) {
       res.status(400).send({
         message: "can not be empty!"
       });
       return;
-    }
+    }*/
     // Create a Comment
 
       // un champs userId supplémentaire doit etre apporté dans la requete
@@ -30,30 +30,13 @@ exports.create = (req, res) => {
       usersLiked : "",
       usersDisliked: "" 
       };
-      // ancien code sans prise en charge de
-     /* const commentObject = req.body;
-    const comment = {
-      ...commentObject,
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-      likes: 0,
-      dislikes: 0,
-      usersLiked : "",
-      usersDisliked: ""
-    }; */
 
       /* test requete postman 
       post  http://localhost:8080/api/comments/create
       
       {"description": "testcommentpostman1",
         "imageUrl": "testcommentpostman1",
-        "published": "true"}
-        
-        {"description": "testcommentpostman2",
         "published": "true",
-        "likes": "0",
-        "dislikes": "0",
-        "usersLiked": "raoultestpostman2",
-        "usersDisliked": "bobtestpostman2",
         "userId": "2",
         "topicId": "2"}
         
@@ -188,15 +171,32 @@ exports.modifyCommentsLikes = (req, res) => {
 // Retrieve all Tutorials from the database.
 
 exports.findAll = (req, res) => {
-    const title = req.query.title;
-    var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
+    const description = req.query.description;
+    var condition = description ? { description: { [Op.like]: `%${description}%` } } : null;
+    if (condition == null) {
+      return res.status(500).send({ message : "erreur lors de la requete"})
+    }
   
     Comment.findAll({ where: condition })
       .then(data => {
-        res.send(data);
+      return  res.send(data);
       })
       .catch(err => {
-        res.status(500).send({
+      return  res.status(500).send({
+          message:
+            err.message || "Some error occurred while retrieving tutorials."
+        });
+      });
+  };
+
+  exports.findTopComment = (req, res) => {
+  
+    Comment.findAll({order : [ ['likes', 'DESC'] ]},{limit: 4})
+      .then(data => {
+      return  res.send(data);
+      })
+      .catch(err => {
+      return  res.status(500).send({
           message:
             err.message || "Some error occurred while retrieving tutorials."
         });
@@ -213,14 +213,14 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  Topic.findByPk(id)
+  Comment.findByPk(id)
     .then(data => {
       if (data === null) { return res.status(500).send({ message: "cette page n'existe pas"})}
-      res.send(data);
+      return res.send(data);
     
     })
     .catch(err => {
-      res.status(500).send({
+    return  res.status(500).send({
         message: "Erreur lors de la recherche de la publication avec un id = " + id
       });
     });
@@ -229,6 +229,8 @@ exports.findOne = (req, res) => {
 // Update a Tutorial by the id in the request
 exports.Commentupdate = (req, res) => {
     const id = req.params.id;
+    if (id === null) { return res.status(500).send({ message: "erreur lors de la requete"})}
+
 
     const commentObject = req.file ?
     {
@@ -240,10 +242,10 @@ exports.Commentupdate = (req, res) => {
       where: { id: id }
     })
       .then( () => { 
-        res.status(200).json({ message: "objet modifié !" });
+      return  res.status(200).json({ message: "objet modifié !" });
         })
       .catch(err => {
-        res.status(500).send({
+      return  res.status(500).send({
           message: "Error updating comment with id=" + id
         });
       });
@@ -256,19 +258,11 @@ exports.delete = (req, res) => {
     Comment.destroy({
       where: { id: id }
     })
-      .then(num => {
-        if (num == 1) {
-          res.send({
-            message: "Tutorial was deleted successfully!"
-          });
-        } else {
-          res.send({
-            message: `Cannot delete Tutorial with id=${id}. Maybe Tutorial was not found!`
-          });
-        }
+      .then(() => {
+      return  res.status(201).json({ message: "objet supprimé !" });
       })
       .catch(err => {
-        res.status(500).send({
+        return  res.status(500).send({
           message: "Could not delete Tutorial with id=" + id
         });
       });
@@ -279,10 +273,10 @@ exports.delete = (req, res) => {
 exports.findAllPublished = (req, res) => {
     Comment.findAll({ where: { published: true } })
       .then(data => {
-        res.send(data);
+        return res.send(data);
       })
       .catch(err => {
-        res.status(500).send({
+        return  res.status(500).send({
           message:
             err.message || "Some error occurred while retrieving tutorials."
         });
