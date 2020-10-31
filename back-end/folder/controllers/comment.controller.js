@@ -3,7 +3,7 @@ const Comment = db.comments;
 const Op = db.Sequelize.Op;
 const fs = require('fs');
 
-// Create and Save a new Tutorial
+// Create and Save a new Comment
 exports.create = (req, res) => {
     // Validate request
     /*if (!req.body.description) {
@@ -12,7 +12,6 @@ exports.create = (req, res) => {
       });
       return;
     }*/
-    // Create a Comment
 
       // un champs userId supplémentaire doit etre apporté dans la requete
       // un champs topicId supplémentaire doit etre apporté dans la requete
@@ -20,11 +19,13 @@ exports.create = (req, res) => {
       {
           ...JSON.parse(req.body.comment),
           imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+          published: false,
           likes: 0,
         dislikes: 0,
         usersLiked : "",
         usersDisliked: ""
       } : { ...req.body,
+        published: false,
         likes: 0,
       dislikes: 0,
       usersLiked : "",
@@ -282,3 +283,26 @@ exports.findAllPublished = (req, res) => {
         });
       });
   };
+
+/* modele requete postman pour .countAllcomment
+{
+  get http://localhost:8080/api/comments/count/1
+
+}*/
+
+
+ exports.countAllcomment = (req, res) => {
+    const topicId = req.params.id;
+    console.log(topicId);
+    Comment.findAndCountAll({ where: { topicId: {[Op.like]:topicId }}})
+      .then(data => {
+        let newData = {}
+        newData.rows = data.rows;
+        newData.count = (data.count).toString();
+        return res.status(200).send(newData);
+      })
+      .catch(() => {
+      return res.status(500).send({ message : "Des erreurs se sont produites lors de la recherche des publications."
+        });
+      });
+  }; 

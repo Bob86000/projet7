@@ -4,7 +4,11 @@ class TutorialDataService {
 
 
   create(data) {
-    return http.post("/topics/create", data);
+    return http.post("/topics/create", data, {
+      headers : {
+        'Content-Type' : 'multipart/form-data'
+      }
+    });
   }
 
   updatelike(id,data){
@@ -17,6 +21,10 @@ class TutorialDataService {
 
   getAllPublished(){
     return http.get(`/topics/published`);
+  }
+
+  getTopTopic() {
+    return http.get("/topics/alltop");
   }
 
   get(id) {

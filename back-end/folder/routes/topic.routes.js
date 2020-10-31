@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const topicsCtrl = require("../controllers/topic.controller.js");
 const verify = require("../middleware/user-Id-security");
+const multer = require('../middleware/multer-config');
   
     // Create a new Tutorial
-    router.post("/create", topicsCtrl.create);
+    router.post("/create", multer, topicsCtrl.create);
 
     // Modify like on a tutorial
     router.put("/create/:id", verify.SavedUser, topicsCtrl.modifyTopicsLikes);
@@ -14,6 +15,9 @@ const verify = require("../middleware/user-Id-security");
 
      // Retrieve all Topics
      router.get("/all", topicsCtrl.findAllTopic);
+
+      // Retrieve all Topics
+      router.get("/alltop", topicsCtrl.findAllTopTopic);
   
     // Retrieve all published Topics
     router.get("/published", topicsCtrl.findAllPublished);

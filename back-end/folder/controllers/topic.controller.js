@@ -9,15 +9,13 @@ const fs = require('fs');
 
   POST http://localhost:8080/api/topics/create
 
-      {"title": "testpostman1",
-        "description": "descriptiontestpostman1",
-        "published": "true",
-        "userId": "1"}
-
         {"title": "testpostman2",
         "description": "descriptiontestpostman2",
         "published": "true",
-        "userId": "2"}
+        "userId": "2",
+        "text": "2222222"}
+
+        sourceKey: 'name', foreignKey: 'userName'
         
       */
 
@@ -25,25 +23,30 @@ const fs = require('fs');
 
 exports.create = (req, res) => {
     // Validate request
-    console.log(req.body);
+    console.log("hello");
+    console.log(req.body.textdata.title);
+    console.log(req.file.File.Filename);
     if (!req.body.title) {
       return res.status(400).send({ message: "le titre est obligatoire"});
     }
     // un champs userId supplémentaire doit etre apporté dans la requete
     const topic = req.file ?
       {
-          ...JSON.parse(req.body.comment),
+          ...JSON.parse(req.body.textdata),
           imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+          published: false,
           likes: 0,
         dislikes: 0,
         usersLiked : "",
         usersDisliked: ""
       } : { ...req.body,
+        published: false,
         likes: 0,
       dislikes: 0,
       usersLiked : "",
       usersDisliked: "" 
       };
+      console.log('bonne route');
          // Save Topic in the database
     Topic.create(topic)
     .then(data => {
@@ -58,7 +61,7 @@ exports.create = (req, res) => {
   put http://localhost:8080/api/topics/create/1
 
   {"userId": 1,
-  "likes": 1}
+  "like": 1}
 }
 
 
@@ -76,7 +79,6 @@ exports.modifyTopicsLikes = (req, res) => {
         let dislike = topic.dislikes;
 
         // transform DB text model in array model 
-
         let newUsersId = req.body.userId;
         let usersLiked = topic.usersLiked.split(" ");
         let usersDisliked = topic.usersDisliked.split(" ");
@@ -183,6 +185,12 @@ exports.findAllTitleTopic = (req, res) => {
       });
   };
 
+/* modele requete postman pour .findAll
+{
+  get http://localhost:8080/api/topics/alltop
+
+}*/
+
   exports.findAllTopic = (req, res) => {
   
     Topic.findAll({order : [ ['id', 'DESC'] ]})
@@ -197,7 +205,19 @@ exports.findAllTitleTopic = (req, res) => {
       });
   };
 
-
+  exports.findAllTopTopic = (req, res) => {
+  
+    Topic.findAll({order : [ ['likes', 'DESC'] ]})
+      .then(data => {
+      return  res.send(data);
+      })
+      .catch(err => {
+      return  res.status(500).send({
+          message:
+            err.message || "Erreur lors de la recherche des publications."
+        });
+      });
+  };
 /* modele requete postman pour .findOne
 {
   get http://localhost:8080/api/topics/1

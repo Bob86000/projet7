@@ -1,6 +1,6 @@
 <template>
  <div>
-<header class="navbar navbar-expand-lg navbar-light bg-light">
+<header class="navbar navbar-expand-lg navbar-light bg-light row">
     <img src="../assets/icon.svg" 
     alt="Logo de l'entreprise Groupomania"
     height="100px"
@@ -13,10 +13,7 @@
   <nav class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <router-link class="nav-link btn btn-light" :to="{name:'bestTopic'}">Les publications populaires<span class="sr-only">(current)</span></router-link>
-      </li>
-      <li class="nav-item active">
-        <router-link class="nav-link btn btn-light" :to="{name: 'home'}">Les commentaires</router-link>
+        <router-link class="nav-link btn btn-light" :to="{name:'home'}">Retour à l'accueil<span class="sr-only">(current)</span></router-link>
       </li>
     </ul>
     <form class="form-inline my-2 my-lg-0 ">
@@ -25,27 +22,7 @@
     </form>
   </nav>
 </header>
-<main class="container">
-    <div class="loading d-flex justify-content-center" v-if="loadingComment">
-        <p>Les données sont en cours de récupération</p>
-    </div>
-    <div v-if="errorComment" class="error">
-      {{ errorComment }}
-    </div>
-    <div v-if="postComment" class="row d-flex justify-content-around ">
-    <router-link v-for="comment in comments" :key="comment.id" :to="{name: 'oneComment', params: {id:comment.id}}" class=" col-sm-3 col-xs-12 my-3 btn btn-light " >
-             <article class="d-block border border-secondary btn btn-light h-100" >
-                <div class="">
-                    <img v-if="!comment.imageUrl" :src="comment.imageUrl" alt="">
-                <p class="description">{{ comment.description}} </p>
-                </div>
-                
-             </article>
-             </router-link>
-             </div>
-    <div class="row d-flex" >
-      <router-link :to="{name: 'addTopic'}" class="text-center btn btn-success mx-auto my-3" >Ajouter une publication</router-link>
-    </div>
+<main class="row">
     <div class="loading d-flex justify-content-center" v-if="loadingTopic">
         <p>Les données sont en cours de récupération</p>
     </div>
@@ -54,48 +31,63 @@
       {{ errorTopic }}
     </div>
 
-<section v-if="postTopic" class="post row text-center">
-    <h2 class="col-12 ">Les dernieres publications</h2>
-        <router-link v-for="topic in topics" :key="topic.id" :to="{name: 'oneTopic', params: {id:topic.id}}" class=" col-12 mx-auto my-3 btn btn-dark" >
-             <article class="col-12 mx-auto my-3 " >
-                <div class=" p-3 mb-2 bg-light text-dark">
-                     <h3 class="my-3">{{ topic.title}}</h3>
-                    <img v-if="topic.imageUrl" :src="topic.imageUrl" alt="">
-                <p>{{ topic.text}} </p>
+<section v-if="currentTopic" class="col-12 text-center ">
+    <h2 class="col-12 ">{{ currentTopic.title}}</h2>
+     <article class="col-12 mx-auto my-3 btn btn-light bg-warning" >
+                <div class="p-3 mb-2 bg-light text-dark d-flex align-items-center justify-content-between">
+                    <img v-if="currentTopic.imageUrl" :src="currentTopic.imageUrl" alt="Image illustrant le commentaire">
+                <p>{{ currentTopic.text }} </p>
                 </div>
                 <div class="d-flex justify-content-between">
-                 <p>{{topic.createdAt.replace('T','_').slice(0,10)}}</p>
+                 <p>{{currentTopic.createdAt.replace('T','_').slice(0,10)}}</p>
+                 <p>{{ currentCommentsCount }} Commentaires</p>
                  <div class="d-flex align-items-center justify-content-between">
-                    <p class="my-auto mx-2">{{topic.likes}}</p> 
-                 <img class="heart" src="../assets/miniheart.jpg" alt="Image representant les likes">
+                    <p class="my-auto mx-2">{{currentTopic.likes}}</p> 
+                 <button class="heart"></button>
                  </div>
                  <div class="d-flex align-items-center justify-content-between">
-                    <p class="my-auto mx-2">{{topic.dislikes}}</p>
-                    <img class="heart" src="../assets/miniace.jpg" alt="Image representant les dislikes">
+                    <p class="my-auto mx-2">{{currentTopic.dislikes}}</p>
+                    <button class="ace"></button>
                  </div>
-                 <p>Publiée par {{topic.userId}}</p>    
+                 <p>Publiée par {{currentTopic.userId}}</p>    
                 </div>
-                
-             </article>
-             </router-link> 
+      </article>
+            <aside class="col-12 " v-if="currentComments">
+             <div v-for="currentComment in currentComments" :key="currentComment.id" class="  col-12 mx-auto my-3 bg-light text-black" >
+                <div class=" mb-2 bg-warning text-white text-dark">
+                    <img v-if="currentComment.imageUrl" :src="currentComment.imageUrl" alt="">
+                <p>{{ currentComment.description}} </p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>{{currentComment.createdAt.replace('T','_').slice(0,10)}}</p>
+                 <div class="d-flex align-items-center justify-content-between">
+                    <p class="my-auto mx-2">{{currentComment.likes}}</p> 
+                 <button class="heart"></button>
+                 </div>
+                 <div class="d-flex align-items-center justify-content-between">
+                    <p class="my-auto mx-2">{{currentComment.dislikes}}</p>
+                    <button class="ace"></button>
+                 </div>
+                 <p>Publiée par {{currentComment.userId}}</p>    
+                </div>
+                </div>
+                 </aside>
 </section>
 </main>
-<footer class="iu">bloc footer</footer> 
+<footer class="iu">bloc footerssss</footer> 
 </div>
 </template>
 
-<script>
-
-
-import TopicDataService from "../services/TopicDataService";
+<script>import TopicDataService from "../services/TopicDataService";
 import CommentDataService from "../services/CommentDataService";
 
 export default {
- name: "Topic-list",
+  name: "tutorial",
   data() {
     return {
-      topics: [],
-      comments: [],
+      currentTopic: null,
+      currentComments: null,
+      currentCommentsCount:null,
       loadingTopic: false,
       loadingComment: false, 
       postTopic: null,
@@ -103,30 +95,25 @@ export default {
       errorTopic: null,
       errorComment: null
     };
-  },
-  mounted () {
-      this.fetchDataHome();
+  },mounted () {
+      this.fetchDatas(this.$route.params.id);
   },
   methods: {
-    fetchDataHome () {
+    fetchDatas (id) {
        // manage state of errors 
       this.errorTopic = this.postTopic = null;
       this.loadingTopic = true;
        this.errorComment = this.postComment = null;
       this.loadingComment = true;
       // Search Data to loading page
-      TopicDataService.getAll()
+      TopicDataService.get(id)
       .then( response => {
           if (response.status == 200){
-              console.log(response.data);
-              this.topics = response.data;
+              this.currentTopic = response.data;
               this.errorTopic = false
               this.postTopic = true;
                 this.loadingTopic = false;
-                for (const item of this.topics) {
-                console.log(item.id);
-              }
-          console.log("response.status")}
+          console.log("héllos")}
           else {
               this.errorTopic = "Echec de la recupération des données";
               this.loadingTopic = false;
@@ -136,14 +123,15 @@ export default {
       this.errorTopic = "Echec de la recupération des données";
       this.loadingTopic = false;}});
 
-      CommentDataService.getTopComment()
+      CommentDataService.getCountAndFindComment(id)
       .then( response => {
           if (response.status == 200){
-              this.comments = response.data;
+              this.currentComments= response.data.rows
+              this.currentCommentsCount= response.data.count;
               this.errorComment = false
               this.postComment = true;
                 this.loadingComment = false;
-          console.log("response.status")}
+                }
           else {
               this.errorComment = "Echec de la recupération des données";
               this.loadingComment = false;
@@ -152,10 +140,9 @@ export default {
           if (response.status != 200){
       this.errorComment = "Echec de la recupération des données";
       this.loadingComment = false;}})
-    }
-    }
-    
+    }  
   }
+}
 </script>
 
 <style>
@@ -180,8 +167,18 @@ html {
     font-size: 0.8rem;
   }
 }
-.heart { 
-    width:37px;
+.ace {
+ width:37px;
     height: 37px;
-    border-radius: 100px; }
+    background: url("../assets/miniace.jpg");
+    background-size: 32px;
+    border-radius: 100px;
+}
+.heart {
+ width:37px;
+    height: 37px;
+    background: url("../assets/miniheart.jpg");
+    background-size: 32px;
+    border-radius: 100px;
+}
 </style>

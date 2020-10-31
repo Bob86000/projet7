@@ -17,19 +17,24 @@ export default new Router({
       component: () => import("./components/Home")
     },
     {
-      path: "/topics",
-      name: "topics",
-      component: () => import("./components/TutorialsList")
-    },
+      path: "/bestTopic",
+      name: "bestTopic",
+        component: () => import("./components/BestTopic")
+      },
     {
       path: "/topic/:id",
       name: "oneTopic",
-      component: () => import("./components/Tutorial")
+      component: () => import("./components/Topic")
+    },
+    {
+      path: "/comment/:id",
+      name: "oneComment",
+      component: () => import("./components/Comment")
     },
     {
       path: "/addtopic",
       name: "addTopic",
-      component: () => import("./components/AddTutorial")
+      component: () => import("./components/AddTopic")
     },
     {
       path: "*",

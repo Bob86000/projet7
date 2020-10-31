@@ -1,10 +1,13 @@
 module.exports = (sequelize, Sequelize) => {
     const Topic = sequelize.define("topic", {
       title: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING, allowNull: false
       },
       imageUrl: {
         type: Sequelize.STRING
+      },
+      text: {
+        type: Sequelize.TEXT,
       },
       published: {
         type: Sequelize.BOOLEAN
@@ -21,6 +24,7 @@ module.exports = (sequelize, Sequelize) => {
       usersDisliked: {
         type: Sequelize.TEXT
       }
+
     });
   
     return Topic;

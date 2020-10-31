@@ -15,6 +15,9 @@ const verify = require("../middleware/user-Id-security");
   // Retrieve 4 last comments 
   router.get("/all4", commentsCtrl.findTopComment);
 
+   // Count all comment with Topicid
+   router.get("/count/:id", commentsCtrl.countAllcomment);
+
   // Retrieve all published comments
   router.get("/published", commentsCtrl.findAllPublished);
 

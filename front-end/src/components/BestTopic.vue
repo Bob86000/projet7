@@ -13,10 +13,7 @@
   <nav class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <router-link class="nav-link btn btn-light" :to="{name:'bestTopic'}">Les publications populaires<span class="sr-only">(current)</span></router-link>
-      </li>
-      <li class="nav-item active">
-        <router-link class="nav-link btn btn-light" :to="{name: 'home'}">Les commentaires</router-link>
+        <router-link class="nav-link btn btn-light" :to="{name:'home'}">Retour à l'accueil<span class="sr-only">(current)</span></router-link>
       </li>
     </ul>
     <form class="form-inline my-2 my-lg-0 ">
@@ -26,26 +23,6 @@
   </nav>
 </header>
 <main class="container">
-    <div class="loading d-flex justify-content-center" v-if="loadingComment">
-        <p>Les données sont en cours de récupération</p>
-    </div>
-    <div v-if="errorComment" class="error">
-      {{ errorComment }}
-    </div>
-    <div v-if="postComment" class="row d-flex justify-content-around ">
-    <router-link v-for="comment in comments" :key="comment.id" :to="{name: 'oneComment', params: {id:comment.id}}" class=" col-sm-3 col-xs-12 my-3 btn btn-light " >
-             <article class="d-block border border-secondary btn btn-light h-100" >
-                <div class="">
-                    <img v-if="!comment.imageUrl" :src="comment.imageUrl" alt="">
-                <p class="description">{{ comment.description}} </p>
-                </div>
-                
-             </article>
-             </router-link>
-             </div>
-    <div class="row d-flex" >
-      <router-link :to="{name: 'addTopic'}" class="text-center btn btn-success mx-auto my-3" >Ajouter une publication</router-link>
-    </div>
     <div class="loading d-flex justify-content-center" v-if="loadingTopic">
         <p>Les données sont en cours de récupération</p>
     </div>
@@ -55,7 +32,7 @@
     </div>
 
 <section v-if="postTopic" class="post row text-center">
-    <h2 class="col-12 ">Les dernieres publications</h2>
+    <h2 class="col-12 ">Les publications populaires</h2>
         <router-link v-for="topic in topics" :key="topic.id" :to="{name: 'oneTopic', params: {id:topic.id}}" class=" col-12 mx-auto my-3 btn btn-dark" >
              <article class="col-12 mx-auto my-3 " >
                 <div class=" p-3 mb-2 bg-light text-dark">
@@ -105,27 +82,23 @@ export default {
     };
   },
   mounted () {
-      this.fetchDataHome();
+      this.fetchDataBestTopic();
   },
   methods: {
-    fetchDataHome () {
+    fetchDataBestTopic () {
        // manage state of errors 
       this.errorTopic = this.postTopic = null;
       this.loadingTopic = true;
        this.errorComment = this.postComment = null;
       this.loadingComment = true;
       // Search Data to loading page
-      TopicDataService.getAll()
+      TopicDataService.getTopTopic()
       .then( response => {
           if (response.status == 200){
-              console.log(response.data);
               this.topics = response.data;
               this.errorTopic = false
               this.postTopic = true;
                 this.loadingTopic = false;
-                for (const item of this.topics) {
-                console.log(item.id);
-              }
           console.log("response.status")}
           else {
               this.errorTopic = "Echec de la recupération des données";
@@ -180,8 +153,8 @@ html {
     font-size: 0.8rem;
   }
 }
-.heart { 
-    width:37px;
+.heart {
+     width:37px;
     height: 37px;
     border-radius: 100px; }
 </style>

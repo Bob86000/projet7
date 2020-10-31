@@ -44,8 +44,8 @@ db.topics.hasOne(db.comments, {
 });
 db.users.hasOne(db.comments, {
   foreignKey: {
-    allowNull: false
-  },
+  allowNull: false
+},
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });

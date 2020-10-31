@@ -1,7 +1,7 @@
 <template>
  <div>
    <div class="row">
-        <h1 class="mx-auto my-3">Groupomania</h1>
+        <h1 class="mx-auto my-3 text-danger">Groupomania</h1>
    </div>
   <nav v-if="id=='signup'" class="navbar navbar-expand">
       <div class="navbar-nav mx-auto">
@@ -25,6 +25,16 @@
     </nav>
   <div class="submit-form">
     <div >
+        <div class="form-group">
+        <label for="description">Name</label>
+        <input
+          class="form-control"
+          id="description"
+          required
+          v-model="user.name"
+          name="description"
+        />
+        </div >
       <div class="form-group">
         <label for="title">Email</label>
         <input
@@ -57,6 +67,10 @@
       </div>
 
     </div>
+    <img src="../assets/icon-above-font.svg" 
+    alt="Logo de l'entreprise Groupomania"
+    height="300px"
+    width="300px" />
   </div>
 </div>
 </template>
@@ -69,6 +83,7 @@ export default {
   data() {
     return {
       user: {
+        name: '',
         email: '',
         password: ''
       },
@@ -88,6 +103,7 @@ export default {
   beforeRouteLeave ( route, redirect,next) {
 
       var user = {
+          name: this.user.name,
         email: this.user.email,
         password: this.user.password
       };
@@ -95,6 +111,11 @@ export default {
       UserDataService.create(user)
         .then(response => {
           if (response.status == 200){
+          this.submitted = true;
+          const Authentification = [];
+          const responseAuth = response.data;
+          Authentification.push(responseAuth);
+          localStorage.setItem("session", JSON.stringify(Authentification));
           this.submitted = true;
           next()
           }
@@ -112,7 +133,12 @@ export default {
           UserDataService.connect(user)
         .then(response => {
           if (response.status == 200){
+              console.log("hey");
           this.submitted = true;
+          const Authentification = [];
+          const responseAuth = response.data;
+          Authentification.push(responseAuth);
+          localStorage.setItem("session", JSON.stringify(Authentification));
           next()
           }
           else  { 
