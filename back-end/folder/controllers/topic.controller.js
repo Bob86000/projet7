@@ -2,7 +2,8 @@ const db = require("../models");
 const Topic = db.topics;
 const Op = db.Sequelize.Op;
 const fs = require('fs');
-
+const multer = require('../middleware/multer-config');
+const decrypt = require('../accessory/decrypt-Id');
 
 
   /*modele requete postman pour .create
@@ -22,31 +23,45 @@ const fs = require('fs');
 // Create and Save a new Topic
 
 exports.create = (req, res) => {
+
+ /* console.log(req.file.filename);
+  console.log(req.file);
+  console.log(req.body);
+    const sauceObject = req.body.sauce;
+    delete sauceObject._id;
+    const sauce = new Sauce({
+      ...sauceObject, //title: req.body.title copie les champs qu'il y a dans la body de la requete et va detaillé les propriétés objets
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+      likes: 0,
+      dislikes: 0,
+      usersLiked : [], //modifier la syntaxe par usersLikes et toute les occurences
+      usersDisliked: []
+    });*/
     // Validate request
-    console.log("hello");
-    console.log(req.body.textdata.title);
-    console.log(req.file.File.Filename);
-    if (!req.body.title) {
-      return res.status(400).send({ message: "le titre est obligatoire"});
-    }
     // un champs userId supplémentaire doit etre apporté dans la requete
+   console.log(decrypt.decryptId);
+   //const actualId = decrypt.decryptId(req.body.topic.userId); 
+   const textObject = JSON.parse(req.body.topic);
+   const actualId = decrypt.decryptId(textObject.userId); 
+    textObject.userId = actualId;
+    console.log(JSON.parse(req.body.topic));
     const topic = req.file ?
       {
-          ...JSON.parse(req.body.textdata),
+          ...textObject,
           imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
           published: false,
           likes: 0,
         dislikes: 0,
         usersLiked : "",
         usersDisliked: ""
-      } : { ...req.body,
+      } : { ...textObject,
         published: false,
         likes: 0,
       dislikes: 0,
       usersLiked : "",
       usersDisliked: "" 
       };
-      console.log('bonne route');
+      console.log(topic);
          // Save Topic in the database
     Topic.create(topic)
     .then(data => {

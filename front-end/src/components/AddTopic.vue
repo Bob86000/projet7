@@ -26,7 +26,7 @@
   </nav>
 </header>
   <div class="submit-form col-md-8 col-xs-12 mx-auto">
-      <div v-if="!submitted">
+      <div v-if="!topic.submitted">
         <div class="form-group">
           <label for="title">Title</label>
           <input
@@ -50,11 +50,7 @@
           />
         </div>
       </div>
-  <span v-if="!files">No files selected</span>
-<ul v-else>
-  <li v-for="file in files" :key="file.name">nom de fichier: {{file.name}} <br> taille: {{file.size}}Octect</li>
-  
-</ul>
+
       <label for="file" ></label>
      <input type="file" class="file" @change="filesSelected" />
       
@@ -76,40 +72,37 @@ export default {
         title: "",
         text: "",
         files: false,
+        submitted: false
       }
     };
   },
   methods: {
 
     fetchDataddTopic () {
-      console.log("heldddddlo");
+      console.log("page chargé");
     
     },
     filesSelected(e) {
-    this.files = e.target.files;
-    console.log(this.files);
-    console.log(this.files[0])
+    this.topic.files = e.target.files[0];
+    
     },
     newTopic () {
-      console.log("heeddddddddllo");
 
-       let textdata = {
-        title: this.topic.title,
-        text: this.topic.text
-      };
-
-      console.log("Textdata");
-    let formData = this.files[0];
-
-    let anothertextdata = { formData, title: this.topic.title, descriptions : this.topic.description };
-    console.log(anothertextdata);
-
-    let data = { formData, textdata};
-    console.log(data);
-
-    console.log(textdata);
-
-     TopicDataService.create(data)
+     let textData = "";
+     let getUserAuth = JSON.parse(localStorage.getItem("session")) || false;
+     console.log(getUserAuth[0].userId);
+     let userId = getUserAuth[0].userId || false;
+     if (!userId) {
+       return alert("Problème d'authentification veuillez vous reconnecter");
+     }
+     if (this.topic.files && this.topic.title) {
+       console.log("le fichier est présent");
+       textData = {title: this.topic.title, text : this.topic.text, userId: userId};
+       console.log(textData);
+       let formData = new FormData();
+       formData.append("image", this.topic.files);
+       formData.append("topic",  JSON.stringify(textData));
+     TopicDataService.create(formData)
         .then(response => {
           this.topic.id = response.data.id;
           console.log(response.data);
@@ -117,6 +110,27 @@ export default {
         .catch(e => {
           console.log(e);
         });
+      }
+     else if (this.topic.title && this.topic.text && !this.topic.file) {
+       console.log("le fichier est vide");
+        textData = { topic: {title: this.topic.title, text : this.topic.text, userId: userId}};
+        let formData = new FormData();
+        formData.append("text", textData);
+        TopicDataService.create(formData)
+        .then(response => {
+          this.topic.id = response.data.id;
+          console.log(response.data);
+        })
+        .catch(e => {
+          console.log(e);
+        });
+      
+     }
+     else  {
+        console.log("le fichier est vide et le titre/text est vide");
+      return confirm("Veuillez remplir correctement les champs avant de cliquer sur envoyer!");
+     }
+
     }
 
   },

@@ -3,12 +3,14 @@ import http from "../http-common";
 class TutorialDataService {
 
 
-  create(data) {
-    return http.post("/topics/create", data, {
+  create(formData) {
+    console.log(formData);
+    return http.post("/topics/create", formData, {
       headers : {
         'Content-Type' : 'multipart/form-data'
       }
-    });
+  }
+    );
   }
 
   updatelike(id,data){
