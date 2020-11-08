@@ -3,8 +3,14 @@ import http from "../http-common";
 class CommentDataService {
 
 
-  create(data) {
-    return http.post("/comments/create", data);
+  create(formData) {
+    console.log("le bonnn fichier");
+    return http.post("/comments/create", formData, {
+      headers : {
+        'Content-Type' : 'multipart/form-data'
+      }
+  }
+    );
   }
 
   updatelike(id,data){

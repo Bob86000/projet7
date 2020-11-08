@@ -1,8 +1,8 @@
 const db = require("../models");
 const Topic = db.topics;
+const User = db.users;
 const Op = db.Sequelize.Op;
 const fs = require('fs');
-const multer = require('../middleware/multer-config');
 const decrypt = require('../accessory/decrypt-Id');
 
 
@@ -208,7 +208,8 @@ exports.findAllTitleTopic = (req, res) => {
 
   exports.findAllTopic = (req, res) => {
   
-    Topic.findAll({order : [ ['id', 'DESC'] ]})
+    //Topic.findAll({order : [ ['id', 'DESC'] ]})
+    Topic.findAll({ include: User, order : [ ['id', 'DESC'] ]})
       .then(data => {
       return  res.send(data);
       })
@@ -222,8 +223,10 @@ exports.findAllTitleTopic = (req, res) => {
 
   exports.findAllTopTopic = (req, res) => {
   
-    Topic.findAll({order : [ ['likes', 'DESC'] ]})
+    //Topic.findAll({order : [ ['likes', 'DESC'] ]})
+    Topic.findAll({ include: User, order : [ ['likes', 'DESC'] ]})
       .then(data => {
+        console.log(data);
       return  res.send(data);
       })
       .catch(err => {
@@ -243,7 +246,7 @@ exports.findAllTitleTopic = (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
   
-    Topic.findByPk(id)
+    Topic.findByPk(id, { include: User})
       .then(data => {
         if (data === null) { return res.status(500).send({ message: "cette page n'existe pas"})}
         return res.send(data);

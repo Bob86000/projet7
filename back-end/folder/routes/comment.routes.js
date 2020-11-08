@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const commentsCtrl = require("../controllers/comment.controller.js");
 const verify = require("../middleware/user-Id-security");
+const multer = require('../middleware/multer-config');
   
   // Create a new Comment
-  router.post("/create", commentsCtrl.create);
+  router.post("/create", multer, commentsCtrl.create);
 
   // Modify like on a Comment
   router.put("/create/:id", verify.SavedUser, commentsCtrl.modifyCommentsLikes);

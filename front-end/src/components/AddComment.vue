@@ -26,26 +26,14 @@
   </nav>
 </header>
   <div class="submit-form col-md-8 col-xs-12 mx-auto">
-      <div v-if="!topic.submitted">
+      <div v-if="!comment.submitted">
         <div class="form-group">
-          <label for="title">Title</label>
-          <input
-          type="text"
-          class="form-control"
-          id="title"
-          required
-          v-model="topic.title"
-          name="title"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="description">Text</label>
+          <label for="description">Commentaire</label>
           <input
           class="form-control"
           id="description"
           required
-          v-model="topic.text"
+          v-model="comment.description"
           name="description"
           />
         </div>
@@ -54,23 +42,22 @@
       <label for="file" ></label>
      <input type="file" class="file" @change="filesSelected" />
       
-      <button to="/" class="nav-link text-center btn btn-secondary" @click="newTopic" >Envoyer</button>
+      <button to="/" class="nav-link text-center btn btn-secondary" @click="newComment" >Envoyer</button>
 </div>
 </div>
 </template>
 
 <script>
 
-import TopicDataService from "../services/TopicDataService";
+import CommentDataService from "../services/CommentDataService";
 
 export default {
   name: "add-topic",
   data() {
     return {
-      topic: {
+      comment: {
         id: null,
-        title: "",
-        text: "",
+        description: "",
         files: false,
         submitted: false
       }
@@ -78,15 +65,15 @@ export default {
   },
   methods: {
 
-    fetchDataddTopic () {
-      console.log("page chargé");
+    fetchDataddComment () {
+      console.log("page chargéééééé");
     
     },
     filesSelected(e) {
-    this.topic.files = e.target.files[0];
+    this.comment.files = e.target.files[0];
     
     },
-    newTopic () {
+    newComment () {
 
      let textData = "";
      let getUserAuth = JSON.parse(localStorage.getItem("session")) || false;
@@ -95,30 +82,32 @@ export default {
      if (!userId) {
        return alert("Problème d'authentification veuillez vous reconnecter");
      }
-     if (this.topic.files && this.topic.title) {
-       console.log("le fichier est présent");
-       textData = {title: this.topic.title, text : this.topic.text, userId: userId};
+     if (this.comment.files && this.comment.description) {
+       console.log("le fichier est présenteeeeeeeeeeeeeeeéééééé");
+       const params = this.$route.params.id;
+       console.log(params);
+       textData = {description: this.comment.description, userId: userId, topicId: this.$route.params.topicId};
        console.log(textData);
        let formData = new FormData();
-       formData.append("image", this.topic.files);
-       formData.append("topic",  JSON.stringify(textData));
-     TopicDataService.create(formData)
+       formData.append("image", this.comment.files);
+       formData.append("comment",  JSON.stringify(textData));
+     CommentDataService.create(formData)
         .then(response => {
-          this.topic.id = response.data.id;
+          this.comment.id = response.data.id;
           console.log(response.data);
         })
         .catch(e => {
           console.log(e);
         });
       }
-     else if (this.topic.title && this.topic.text && !this.topic.file) {
-       console.log("tester cette partie la en adaptant le code");
-        textData = { topic: {title: this.topic.title, text : this.topic.text, userId: userId}};
+     else if (this.comment.description && !this.comment.file) {
+       console.log("le fichier est vide");
+        textData = { comment: {description: this.comment.description, userId: userId}};
         let formData = new FormData();
-        formData.append("topic",  JSON.stringify(textData));
-        TopicDataService.create(formData)
+        formData.append("comment",  JSON.stringify(textData));
+        CommentDataService.create(formData)
         .then(response => {
-          this.topic.id = response.data.id;
+          this.comment.id = response.data.id;
           console.log(response.data);
         })
         .catch(e => {
@@ -135,7 +124,7 @@ export default {
 
   },
   mounted () {
-    this.fetchDataddTopic() 
+    this.fetchDataddComment(this.$route.params.id) 
   }
   }
 </script>

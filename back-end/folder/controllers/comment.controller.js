@@ -2,6 +2,7 @@ const db = require("../models");
 const Comment = db.comments;
 const Op = db.Sequelize.Op;
 const fs = require('fs');
+const decrypt = require('../accessory/decrypt-Id');
 
 // Create and Save a new Comment
 exports.create = (req, res) => {
@@ -12,25 +13,31 @@ exports.create = (req, res) => {
       });
       return;
     }*/
-
       // un champs userId supplémentaire doit etre apporté dans la requete
-      // un champs topicId supplémentaire doit etre apporté dans la requete
-      const comment = req.file ?
+      console.log(decrypt.decryptId);
+      console.log(req.body.comment);
+   //const actualId = decrypt.decryptId(req.body.comment.userId); 
+   const commentObject = JSON.parse(req.body.comment);
+   const actualId = decrypt.decryptId(commentObject.userId); 
+   commentObject.userId = actualId;
+   console.log(commentObject);
+    const comment = req.file ?
       {
-          ...JSON.parse(req.body.comment),
+          ...commentObject,
           imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
           published: false,
           likes: 0,
         dislikes: 0,
         usersLiked : "",
         usersDisliked: ""
-      } : { ...req.body,
+      } : { ...commentObject,
         published: false,
         likes: 0,
       dislikes: 0,
       usersLiked : "",
       usersDisliked: "" 
       };
+      console.log(comment);
 
       /* test requete postman 
       post  http://localhost:8080/api/comments/create

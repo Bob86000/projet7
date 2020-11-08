@@ -34,9 +34,9 @@
 <section v-if="currentTopic" class="col-12 text-center ">
     <h2 class="col-12 ">{{ currentTopic.title}}</h2>
      <article class="col-12 mx-auto my-3 btn btn-light bg-warning" >
-                <div class="p-3 mb-2 bg-light text-dark d-flex align-items-center justify-content-between">
+                <div class="p-3 mb-2 bg-light text-dark d-flex flex-column justify-content-center align-items-center">
                     <img v-if="currentTopic.imageUrl" :src="currentTopic.imageUrl" alt="Image illustrant le commentaire">
-                <p>{{ currentTopic.text }} </p>
+                <p class="article__text">{{ currentTopic.text }} </p>
                 </div>
                 <div class="d-flex justify-content-between">
                  <p>{{currentTopic.createdAt.replace('T','_').slice(0,10)}}</p>
@@ -49,9 +49,12 @@
                     <p class="my-auto mx-2">{{currentTopic.dislikes}}</p>
                     <button class="ace"></button>
                  </div>
-                 <p>Publiée par {{currentTopic.userId}}</p>    
+                 <p>Publiée par {{currentTopic.user.name}}</p>    
                 </div>
       </article>
+      <div class="row d-flex" >
+      <router-link :to="{name: 'addComment', params: { topicId: topicId}}" class="text-center btn btn-warning mx-auto my-3" >Ajouter un commentaire</router-link>
+      </div>
             <aside class="col-12 " v-if="currentComments">
              <div v-for="currentComment in currentComments" :key="currentComment.id" class="  col-12 mx-auto my-3 bg-light text-black" >
                 <div class=" mb-2 bg-warning text-white text-dark">
@@ -93,10 +96,12 @@ export default {
       postTopic: null,
       postComment: null,
       errorTopic: null,
-      errorComment: null
+      errorComment: null,
+      topicId: this.$route.params.id
     };
   },mounted () {
       this.fetchDatas(this.$route.params.id);
+      console.log(this.topicId);
   },
   methods: {
     fetchDatas (id) {
@@ -148,6 +153,14 @@ export default {
 <style>
 html {
   font-size: 1rem;
+}
+section img {
+  width:80%;
+}
+.article__text{
+  width: 80%;
+  background-color: rgba(202, 211, 122, 0.404);
+  border: 1px solid rgb(190, 174, 21);
 }
 @media all and (max-width: 575.98px){
   html {

@@ -37,6 +37,12 @@ export default new Router({
       component: () => import("./components/AddTopic")
     },
     {
+      path: "/addcomment/:topicId",
+      name: "addComment",
+      component: () => import("./components/AddComment")
+    },
+    
+    {
       path: "*",
       redirect: '/'
     }

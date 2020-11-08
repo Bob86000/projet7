@@ -33,18 +33,18 @@
       {{ errorComment }}
     </div>
     <div v-if="postComment" class="row d-flex justify-content-around ">
-    <router-link v-for="comment in comments" :key="comment.id" :to="{name: 'oneComment', params: {id:comment.id}}" class=" col-sm-3 col-xs-12 my-3 btn btn-light " >
+    <router-link v-for="comment in comments" :key="comment.id" :to="{name: 'oneTopic', params: {id:comment.topicId}}" class=" col-sm-3 col-xs-12 my-3 btn btn-light " >
              <article class="d-block border border-secondary btn btn-light h-100" >
-                <div class="">
-                    <img v-if="!comment.imageUrl" :src="comment.imageUrl" alt="">
-                <p class="description">{{ comment.description}} </p>
+                <div class="d-flex flex-column justify-content-center align-items-center">
+                    <img class= "mainHeader__img" v-if="comment.imageUrl" :src="comment.imageUrl" alt="">
+                <p class="description article__text">{{ comment.description}} </p>
                 </div>
-                
+             <p>Commenté par {{comment.userId}}</p>       
              </article>
              </router-link>
              </div>
     <div class="row d-flex" >
-      <router-link :to="{name: 'addTopic'}" class="text-center btn btn-success mx-auto my-3" >Ajouter une publication</router-link>
+      <router-link :to="{name: 'addTopic',}" class="text-center btn btn-success mx-auto my-3" >Ajouter une publication</router-link>
     </div>
     <div class="loading d-flex justify-content-center" v-if="loadingTopic">
         <p>Les données sont en cours de récupération</p>
@@ -57,11 +57,11 @@
 <section v-if="postTopic" class="post row text-center">
     <h2 class="col-12 ">Les dernieres publications</h2>
         <router-link v-for="topic in topics" :key="topic.id" :to="{name: 'oneTopic', params: {id:topic.id}}" class=" col-12 mx-auto my-3 btn btn-dark" >
-             <article class="col-12 mx-auto my-3 " >
-                <div class=" p-3 mb-2 bg-light text-dark">
+             <article class="col-12 mx-auto my-3  " >
+                <div class=" p-3 mb-2 bg-light text-dark d-flex flex-column justify-content-center align-items-center">
                      <h3 class="my-3">{{ topic.title}}</h3>
                     <img v-if="topic.imageUrl" :src="topic.imageUrl" alt="">
-                <p>{{ topic.text}} </p>
+                <p class="article__text">{{ topic.text}} </p>
                 </div>
                 <div class="d-flex justify-content-between">
                  <p>{{topic.createdAt.replace('T','_').slice(0,10)}}</p>
@@ -73,7 +73,7 @@
                     <p class="my-auto mx-2">{{topic.dislikes}}</p>
                     <img class="heart" src="../assets/miniace.jpg" alt="Image representant les dislikes">
                  </div>
-                 <p>Publiée par {{topic.userId}}</p>    
+                 <p>Publiée par {{topic.user.name}}</p>    
                 </div>
                 
              </article>
@@ -161,6 +161,17 @@ export default {
 <style>
 html {
   font-size: 1rem;
+}
+.mainHeader__img {
+  width: 80%;
+}
+section img {
+  width:80%;
+}
+.article__text{
+  width: 80%;
+  background-color: rgba(163, 211, 122, 0.404);
+  border: 1px solid rgb(66, 206, 11);
 }
 @media all and (max-width: 575.98px){
   html {

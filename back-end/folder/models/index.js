@@ -24,13 +24,14 @@ db.comments = require("./comment.model.js")(sequelize, Sequelize);
 
 // add primary-key users in topics table 
 
-db.users.hasOne(db.topics, {
+db.users.hasMany(db.topics, {
   foreignKey: {
   allowNull: false
 },
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
+db.topics.belongsTo(db.users);
 
 // add primary-key topics and users in comment table 
 
