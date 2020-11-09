@@ -137,14 +137,14 @@ export default {
      if (!userId) {
        return alert("Problème d'authentification veuillez vous reconnecter");
      }
-     if (this.topic.files && this.topic.title) {
+     if (this.topic.files && this.topic.title ) {
        console.log("le fichier est présent");
        textData = {title: this.topic.title, text : this.topic.text, userId: userId};
        console.log(textData);
        let formData = new FormData();
        formData.append("image", this.topic.files);
        formData.append("topic",  JSON.stringify(textData));
-     TopicDataService.create(formData)
+     TopicDataService.updatefile(this.topicId ,formData)
         .then(response => {
           this.topic.id = response.data.id;
           console.log(response.data);
@@ -158,7 +158,7 @@ export default {
         textData = { topic: {title: this.topic.title, text : this.topic.text, userId: userId}};
         let formData = new FormData();
         formData.append("topic",  JSON.stringify(textData));
-        TopicDataService.create(formData)
+        TopicDataService.update(this.topicId, formData)
         .then(response => {
           this.topic.id = response.data.id;
           console.log(response.data);

@@ -260,26 +260,36 @@ exports.findOne = (req, res) => {
   };
 
 // Update a Topic by the id in the request
-exports.update = (req, res) => {
+exports.updatefile = (req, res) => {
 // Verify if origin request come from topic OP
  /* if (req.auth.id != data.userId) {
     return res.status(400).send({
       message: "Vous n'êtes pas l'auteur de la publication"
     });
   }*/
-   const id = req.params.id;
-   if (id == null) {
-    return res.status(500).send({ message : "erreur lors de la requete"})
-  }
-
-    const topicObject = req.file ?
-    {
-        ...JSON.parse(req.body.topic),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    } : { ...req.body };
+   // un champs userId supplémentaire doit etre apporté dans la requete
+   //const actualId = decrypt.decryptId(req.body.topic.userId); 
+   const textObject = JSON.parse(req.body.topic);
+   const topicId = req.params.id
+   const actualId = decrypt.decryptId(textObject.userId); 
+   const imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+    textObject.userId = actualId;
+    textObject.imageUrl = imageUrl;
+    console.log(JSON.parse(req.body.topic));
+    
+    Topic.findByPk(topicId)
+    .then(data => {
+      console.log("hello");
+      console.log(data.userId);
+      console.log("no hello");
+      if (data === null) { return res.status(500).send({ message: "cette page n'existe pas"})}
+      
+      if ( data.userId == actualId) {
+        console.log(data.userId);
+        console.log("ok");
   
-    Comment.update(topicObject, {
-      where: { id: id }
+    Topic.update(textObject, {
+      where: { id: data.id}
     })
       .then( () => { 
         res.status(200).json({ message: "objet modifié !" });
@@ -289,7 +299,46 @@ exports.update = (req, res) => {
           message: "Error updating Topic with id=" + id
         });
       });
-  };
+  };})
+  .catch(err => {
+    return  res.status(500).send({
+        message:
+          err.message || "Erreur lors de la recherche des publications."
+      });
+    });
+  }
+
+
+  exports.update = (req, res) => {
+    // Verify if origin request come from topic OP
+     /* if (req.auth.id != data.userId) {
+        return res.status(400).send({
+          message: "Vous n'êtes pas l'auteur de la publication"
+        });
+      }*/
+       const id = req.params.id;
+       if (id == null) {
+        return res.status(500).send({ message : "erreur lors de la requete"})
+      }
+    
+        const topicObject = req.file ?
+        {
+            ...JSON.parse(req.body.topic),
+            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        } : { ...req.body };
+      
+        Topic.update(topicObject, {
+          where: { id: id }
+        })
+          .then( () => { 
+            res.status(200).json({ message: "objet modifié !" });
+            })
+          .catch(err => {
+            res.status(500).send({
+              message: "Error updating Topic with id=" + id
+            });
+          });
+      };
 
 // Delete a Topic with the specified id in the request
 exports.delete = (req, res) => {

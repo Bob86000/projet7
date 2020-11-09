@@ -33,9 +33,16 @@ class TutorialDataService {
     return http.get(`/topics/${id}`);
   }
 
-  update(id, data) {
-    return http.put(`/topics/${id}`, data);
-  }
+  updatefile(id, data) {
+    return http.put(`/topics/file/${id}`, data, {
+      headers : {
+        'Content-Type' : 'multipart/form-data'
+      }
+  });
+}
+update(id, data) {
+  return http.put(`/topics/${id}`, data);
+}
 
   delete(topicId, auth) {
     return http.delete(`/topics/${topicId}`, {

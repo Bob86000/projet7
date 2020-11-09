@@ -26,7 +26,7 @@ const multer = require('../middleware/multer-config');
    router.get("/:id", commentsCtrl.findOne);
 
   // Update a Comment with id
-  router.put("/:id", commentsCtrl.Commentupdate );
+  router.put("/file/:id", multer, commentsCtrl.updatefile );
 
   // Delete a Comment with id
   router.delete("/:id", commentsCtrl.delete);

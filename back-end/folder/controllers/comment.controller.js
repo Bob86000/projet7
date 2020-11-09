@@ -234,6 +234,52 @@ exports.findOne = (req, res) => {
       });
     });
 };
+exports.updatefile = (req, res) => {
+  // Verify if origin request come from topic OP
+   /* if (req.auth.id != data.userId) {
+      return res.status(400).send({
+        message: "Vous n'êtes pas l'auteur de la publication"
+      });
+    }*/console.log("hrllo");
+     // un champs userId supplémentaire doit etre apporté dans la requete
+     //const actualId = decrypt.decryptId(req.body.topic.userId); 
+     const commentObject = JSON.parse(req.body.comment);
+     const commentId = req.params.id;
+     const actualId = decrypt.decryptId(commentObject.userId); 
+     const imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+      commentObject.userId = actualId;
+      commentObject.imageUrl = imageUrl;
+      
+      Comment.findByPk(commentId)
+      .then(data => {
+        console.log("hello");
+        console.log(data.userId);
+        console.log("no hello");
+        if (data === null) { return res.status(500).send({ message: "cette page n'existe pas"})}
+        
+        if ( data.userId == actualId) {
+          console.log(data.userId);
+          console.log("ok");
+    
+      Comment.update(commentObject, {
+        where: { id: data.id}
+      })
+        .then( () => { 
+          res.status(200).json({ message: "objet modifié !" });
+          })
+        .catch(err => {
+          res.status(500).send({
+            message: "Error updating comment with id=sssssssssss" + id
+          });
+        });
+    };})
+    .catch(err => {
+      return  res.status(500).send({
+          message:
+            err.message || "Erreur lors de la recherche des publications."
+        });
+      });
+    }
 
 // Update a Tutorial by the id in the request
 exports.Commentupdate = (req, res) => {

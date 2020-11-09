@@ -39,7 +39,7 @@
       <label for="file" ></label>
      <input type="file" class="file" accept="image/*" @change="filesSelected" />
      <img id="output" :src="currentComments.imageUrl">
-      <button to="/" class="nav-link text-center btn btn-secondary" @click="newTopic" >Envoyer</button>
+      <button to="/" class="nav-link text-center btn btn-secondary" @click="newComment" >Envoyer</button>
 </div>
 </div>
 </template>
@@ -49,20 +49,18 @@
 import CommentDataService from "../services/CommentDataService";
 
 export default {
-  name: "add-topic",
+  name: "modify-comment",
   data() {
     return {
-      topic: {
+      currentComments: {
         id: null,
-        title: "",
-        text: "",
+        description: "",
         files: false,
         submitted: false
       },
-      currentComments: null,
       loadingComment: false, 
       errorComment: null,
-      topicId: this.$route.params.id,
+      currentCommentsId: this.$route.params.id,
       userId: null
     };
   },
@@ -94,14 +92,14 @@ export default {
       console.log("Echec de la recupération des données");
     }})},
     filesSelected(e) {
-    this.topic.files = e.target.files[0];
+    this.currentComments.files = e.target.files[0];
     var output = document.getElementById('output');
     output.src = URL.createObjectURL(e.target.files[0]);
     output.onload = function() {
       URL.revokeObjectURL(output.src) 
     }
     ;},
-    newTopic () {
+    newComment () {
 
      let textData = "";
      let getUserAuth = JSON.parse(localStorage.getItem("session")) || false;
@@ -110,30 +108,30 @@ export default {
      if (!userId) {
        return alert("Problème d'authentification veuillez vous reconnecter");
      }
-     if (this.topic.files && this.topic.title) {
+     if (this.currentComments.files && this.currentComments.description) {
        console.log("le fichier est présent");
-       textData = {title: this.topic.title, text : this.topic.text, userId: userId};
+       textData = {description : this.currentComments.description, userId: userId};
        console.log(textData);
        let formData = new FormData();
-       formData.append("image", this.topic.files);
-       formData.append("topic",  JSON.stringify(textData));
-     CommentDataService.create(formData)
+       formData.append("image", this.currentComments.files);
+       formData.append("comment",  JSON.stringify(textData));
+    CommentDataService.updatefile(this.currentCommentsId ,formData)
         .then(response => {
-          this.topic.id = response.data.id;
+          this.currentComments.id = response.data.id;
           console.log(response.data);
         })
         .catch(e => {
           console.log(e);
         });
       }
-     else if (this.topic.title && this.topic.text && !this.topic.file) {
+     else if (this.currentComments.description && !this.currentComments.file) {
        console.log("tester cette partie la en adaptant le code");
-        textData = { topic: {title: this.topic.title, text : this.topic.text, userId: userId}};
+        textData = { comment: {description : this.currentComments.description, userId: userId}};
         let formData = new FormData();
         formData.append("topic",  JSON.stringify(textData));
-        CommentDataService.create(formData)
+        CommentDataService.update(this.currentCommentsId, formData)
         .then(response => {
-          this.topic.id = response.data.id;
+          this.currentComments.id = response.data.id;
           console.log(response.data);
         })
         .catch(e => {

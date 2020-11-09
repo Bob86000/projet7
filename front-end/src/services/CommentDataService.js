@@ -33,9 +33,16 @@ class CommentDataService {
     return http.get(`/comments/${id}`);
   }
 
-  update(id, data) {
-    return http.put(`/comments/${id}`, data);
-  }
+  updatefile(id, data) {
+    return http.put(`/comments/file/${id}`, data, {
+      headers : {
+        'Content-Type' : 'multipart/form-data'
+      }
+  });
+}
+update(id, data) {
+  return http.put(`/comments/${id}`, data);
+}
 
   delete(commentId, auth) {
     return http.delete(`/comments/${commentId}`, {
