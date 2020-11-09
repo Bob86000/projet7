@@ -99,7 +99,7 @@ export default {
               this.errorTopic = false
               this.postTopic = true;
                 this.loadingTopic = false;
-          console.log("response.status")}
+          }
           else {
               this.errorTopic = "Echec de la recupération des données";
               this.loadingTopic = false;
@@ -116,7 +116,7 @@ export default {
               this.errorComment = false
               this.postComment = true;
                 this.loadingComment = false;
-          console.log("response.status")}
+          }
           else {
               this.errorComment = "Echec de la recupération des données";
               this.loadingComment = false;

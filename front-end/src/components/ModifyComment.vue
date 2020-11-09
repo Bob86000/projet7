@@ -15,9 +15,6 @@
       <li class="nav-item active">
         <router-link class="nav-link btn btn-light" :to="{name:'bestTopic'}">Les publications populaires<span class="sr-only">(current)</span></router-link>
       </li>
-      <li class="nav-item active">
-        <router-link class="nav-link btn btn-light" :to="{name: 'home'}">Les commentaires</router-link>
-      </li>
     </ul>
     <form class="form-inline my-2 my-lg-0 ">
       <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
@@ -26,18 +23,6 @@
   </nav>
 </header>
   <div class="submit-form col-md-8 col-xs-12 mx-auto">
-      <div v-if="!topic.submitted">
-        <div class="form-group">
-          <label for="title">Title</label>
-          <input
-          type="text"
-          class="form-control"
-          id="title"
-          required
-          v-model="topic.title"
-          name="title"
-          />
-        </div>
 
         <div class="form-group">
           <label for="description">Text</label>
@@ -45,15 +30,15 @@
           class="form-control"
           id="description"
           required
-          v-model="topic.text"
+          v-model="currentComments.description"
           name="description"
+           :placeholder="currentComments.description"
           />
         </div>
-      </div>
 
       <label for="file" ></label>
-     <input type="file" class="file" @change="filesSelected" />
-      
+     <input type="file" class="file" accept="image/*" @change="filesSelected" />
+     <img id="output" :src="currentComments.imageUrl">
       <button to="/" class="nav-link text-center btn btn-secondary" @click="newTopic" >Envoyer</button>
 </div>
 </div>
@@ -61,7 +46,7 @@
 
 <script>
 
-import TopicDataService from "../services/TopicDataService";
+import CommentDataService from "../services/CommentDataService";
 
 export default {
   name: "add-topic",
@@ -73,7 +58,12 @@ export default {
         text: "",
         files: false,
         submitted: false
-      }
+      },
+      currentComments: null,
+      loadingComment: false, 
+      errorComment: null,
+      topicId: this.$route.params.id,
+      userId: null
     };
   },
   methods: {
@@ -81,7 +71,28 @@ export default {
     fetchDataddTopic () {
       console.log("page chargé");
     
-    },
+    }, fetchDatas (id) {
+       // manage state of errors 
+       this.errorComment = null;
+      this.loadingComment = true;
+      let getUserAuth = JSON.parse(localStorage.getItem("session")) || false;
+      console.log(getUserAuth[0].userId);
+      let userAuth = getUserAuth[0].userId.slice(16) || false;
+      // Search Data to loading page
+      CommentDataService.get(id)
+      .then( response => {
+          if (response.status == 200){
+              this.currentComments = response.data;
+              this.userId = userAuth;
+              console.log(this.userId)
+          console.log("héllos")}
+          else {
+              console.log("Echec de la recupération des données");
+          }})
+      .catch(response => {
+          if (response.status != 200){
+      console.log("Echec de la recupération des données");
+    }})},
     filesSelected(e) {
     this.topic.files = e.target.files[0];
     var output = document.getElementById('output');
@@ -89,8 +100,7 @@ export default {
     output.onload = function() {
       URL.revokeObjectURL(output.src) 
     }
-    
-    },
+    ;},
     newTopic () {
 
      let textData = "";
@@ -107,7 +117,7 @@ export default {
        let formData = new FormData();
        formData.append("image", this.topic.files);
        formData.append("topic",  JSON.stringify(textData));
-     TopicDataService.create(formData)
+     CommentDataService.create(formData)
         .then(response => {
           this.topic.id = response.data.id;
           console.log(response.data);
@@ -121,7 +131,7 @@ export default {
         textData = { topic: {title: this.topic.title, text : this.topic.text, userId: userId}};
         let formData = new FormData();
         formData.append("topic",  JSON.stringify(textData));
-        TopicDataService.create(formData)
+        CommentDataService.create(formData)
         .then(response => {
           this.topic.id = response.data.id;
           console.log(response.data);
@@ -141,6 +151,7 @@ export default {
   },
   mounted () {
     this.fetchDataddTopic() 
+    this.fetchDatas(this.$route.params.id);
   }
   }
 </script>

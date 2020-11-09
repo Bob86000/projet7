@@ -53,8 +53,9 @@
                 </div>
       </article>
       <div class="row d-flex" >
-        <router-link :to="{name: 'addComment', params: { topicId: topicId}}" class="text-center btn btn-warning mx-auto my-3" >Ajouter un commentaire</router-link>
-        <router-link v-if="userId==currentTopic.userId" :to="{name: 'home'}" class="text-center btn btn-danger mx-auto my-3" >Supprimer la publication</router-link>
+        <router-link :to="{name: 'addComment', params: { topicId: topicId}}" class="text-center btn btn-warning  mx-auto my-3" >Ajouter un commentaire</router-link>
+        <router-link v-if="userId==currentTopic.userId" :to="{name: 'modifyTopic', params: { topicId: topicId}}" class="text-center btn btn-success mx-auto my-3" >Modifier la publication</router-link>
+        <router-link v-if="userId==currentTopic.userId" event="" @click.native.prevent='deleteTopic' :to="{name: 'home'}" class="text-center btn btn-danger mx-auto my-3" >Supprimer la publication</router-link>
       
       </div>
             <aside class="col-12" v-if="currentComments">
@@ -75,7 +76,8 @@
                  </div>
                  <p>Publiée par {{currentComment.user.name}}</p>    
                 </div>
-                <button v-if="userId==currentComment.userId" :id="'delete'+currentComment.id" class="text-center btn btn-danger mx-auto my-3" @click="deleteComment" >Supprimer la publication</button>
+                <button v-if="userId==currentComment.userId" :id="'deleteComment'+currentComment.id" class="text-center btn btn-danger mx-auto my-3" @click="deleteComment" >Supprimer la publication</button>
+                <router-link v-if="userId==currentComment.userId" :to="{name: 'modifyComment', params: { topicId: currentComment.id}}" class="text-center btn btn-success mx-auto my-3" >Modifier le commentaire</router-link>
                 </div>
                 
                  </aside>
@@ -85,7 +87,8 @@
 </div>
 </template>
 
-<script>import TopicDataService from "../services/TopicDataService";
+<script>
+import TopicDataService from "../services/TopicDataService";
 import CommentDataService from "../services/CommentDataService";
 
 export default {
@@ -160,20 +163,37 @@ export default {
       console.log(e.target.id);
     },
     deleteComment(e) {
-      const deleteCommentId = (e.target.id).slice(6);
-      const deleteAuth= { userId : this.userId }
+      const deleteCommentId = (e.target.id).slice(13);
+      const needAuth = this.userId
       console.log (deleteCommentId);
-      CommentDataService.delete(deleteCommentId, deleteAuth)
+      CommentDataService.delete(deleteCommentId, needAuth)
       .then( response => {
-       if (response.status == 201){
-                this.deleteComment = false;
+       if ( response.status == 505 ){
+                return console.log("suppression du commentaire réussi");
+              }
+        else {
+          return  console.log('echec de la supression du commentaire');
+          }})
+      .catch( () => {
+     return console.log('echec de la supressionssssssssss du commentaire')});
+  },
+deleteTopic() {
+      const deleteTopicId = this.topicId;
+      const needAuth= this.userId;
+      console.log (deleteTopicId);
+      TopicDataService.delete(deleteTopicId, needAuth)
+      .then( response => {
+       if (response.status == 201 || response.status == 505 ){
+                console.log("suppression de la publication réussi");
+                this.$router.push({name: 'home'});
               }
         else {
           return  console.log('echec de la supression du commentaire');
           }})
       .catch( () => {
      return console.log('echec de la supression du commentaire')});
-  }
+}
+  
     
   }
 }

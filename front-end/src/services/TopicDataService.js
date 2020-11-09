@@ -37,9 +37,14 @@ class TutorialDataService {
     return http.put(`/topics/${id}`, data);
   }
 
-  delete(id) {
-    return http.delete(`/topics/${id}`);
-  }
+  delete(topicId, auth) {
+    return http.delete(`/topics/${topicId}`, {
+      params : {
+        topicId : topicId,
+        userId : auth
+
+      }
+  })}
 
   deleteAll() {
     return http.delete(`/topics/`);

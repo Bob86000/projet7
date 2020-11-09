@@ -27,9 +27,19 @@ export const router = new Router({
       component: () => import("./components/Topic")
     },
     {
+      path: "/topic/modify/:id",
+      name: "modifyTopic",
+      component: () => import("./components/ModifyTopic")
+    },
+    {
       path: "/comment/:id",
       name: "oneComment",
       component: () => import("./components/Comment")
+    },
+    {
+      path: "/comment/modify/:id",
+      name: "modifyComment",
+      component: () => import("./components/ModifyComment")
     },
     {
       path: "/addtopic",

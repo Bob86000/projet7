@@ -263,36 +263,39 @@ exports.Commentupdate = (req, res) => {
 // Delete a Tutorial with the specified id in the request
 exports.delete = (req, res) => {
 
-  const responseObject = JSON.parse(req.body);
-   const actualId = decrypt.decryptId(responseObject.userId); 
-  responseObject.userId = actualId;
-  const commentId = responseObject.id
+  const actualId= req.query.userId;
+  const commentId =  req.query.commentId;
 
     Comment.findByPk(commentId)
     .then(data => {
+      console.log("hello");
+      console.log(data.userId);
+      console.log("no hello");
       if (data === null) { return res.status(500).send({ message: "cette page n'existe pas"})}
       
       if ( data.userId == actualId) {
+        console.log(data.userId);
+        console.log("ok");
 
         Comment.destroy({
-          where: { id: id }
+          where: { id: data.id}
         })
-          .then(() => {
-          return  res.status(201).json({ message: "objet supprimé !" });
+          .then(res => {
+          return  res.status(201).send({ message: "objet supprimé !" });
           })
           .catch(err => {
-            return  res.status(500).send({
-              message: "Could not delete Comment with id=" + id
+            return  res.status(505).send({
+              message: "Could not delete Comment with id=" + commentId
             });
           });
 
       }
-       return res.status(500).json({ message: "problème d'authentification !" })
+      else { return res.status(500).send({ message: "problème d'authentification !" })}
     
     })
     .catch(err => {
     return  res.status(500).send({
-        message: "Erreur lors de la recherche de la publication avec un id = " + id
+        message: "Erreur lors de la recherche de la publication avec un id = " + commentId
       });
     });
   

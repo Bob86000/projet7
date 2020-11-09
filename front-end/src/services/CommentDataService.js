@@ -37,9 +37,14 @@ class CommentDataService {
     return http.put(`/comments/${id}`, data);
   }
 
-  delete(id, data) {
-    return http.delete(`/comments/${id}`, data);
-  }
+  delete(commentId, auth) {
+    return http.delete(`/comments/${commentId}`, {
+      params : {
+        commentId : commentId,
+        userId : auth
+
+      }
+  })}
 
   deleteAll() {
     return http.delete(`/comments/`);

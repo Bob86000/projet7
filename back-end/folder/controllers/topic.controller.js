@@ -293,19 +293,45 @@ exports.update = (req, res) => {
 
 // Delete a Topic with the specified id in the request
 exports.delete = (req, res) => {
-    const id = req.params.id;
-  
-    Topic.destroy({
-      where: { id: id }
-    })
-      .then(() => {
-        res.status(201).json({ message: "objet supprimé !" });
+
+  const actualId= req.query.userId;
+  const topicId =  parseInt(req.query.topicId);
+
+    Topic.findByPk(topicId)
+    .then(data => {
+      console.log("hello");
+      console.log(data.userId);
+      console.log("no hello");
+      console.log(typeof topicId);
+      if (data === null) { return res.status(500).send({ message: "cette page n'existe pas"})}
+      else if ( data.userId == actualId) {
+        console.log(data.userId);
+        console.log("ok");
+
+        Topic.destroy({
+          where: { id: topicId }
+        })
+          .then(res => {
+           return res.status(201).send({ message: "objet supprimé !" });
           })
-      .catch(err => {
-        res.status(500).send({
-          message: "Impossible de supprimer la publication avec un id=" + id
-        });
+          .catch(err => {
+            return res.status(505).send({
+            message: "Could not delete Topicwith id=" + topicId
+            });
+          }); 
+        }
+        else { return res.status(500).send({ message: "problème d'authentification !" })}
+    
+     
+    
+    })
+    .catch(err => {
+     res.status(500).send({
+        message: "Erreur lors de la recherche de la publication avec un id = " + topicId
       });
+    });
+  
+    
   };
 
 // Delete all Topics from the database.

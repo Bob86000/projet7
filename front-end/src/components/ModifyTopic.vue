@@ -15,9 +15,6 @@
       <li class="nav-item active">
         <router-link class="nav-link btn btn-light" :to="{name:'bestTopic'}">Les publications populaires<span class="sr-only">(current)</span></router-link>
       </li>
-      <li class="nav-item active">
-        <router-link class="nav-link btn btn-light" :to="{name: 'home'}">Les commentaires</router-link>
-      </li>
     </ul>
     <form class="form-inline my-2 my-lg-0 ">
       <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
@@ -36,6 +33,7 @@
           required
           v-model="topic.title"
           name="title"
+          :placeholder="currentTopic.title"
           />
         </div>
 
@@ -47,13 +45,14 @@
           required
           v-model="topic.text"
           name="description"
+           :placeholder="currentTopic.text"
           />
         </div>
       </div>
 
       <label for="file" ></label>
-     <input type="file" class="file" @change="filesSelected" />
-      
+     <input type="file" class="file" accept="image/*" @change="filesSelected" />
+     <img id="output" :src="currentTopic.imageUrl">
       <button to="/" class="nav-link text-center btn btn-secondary" @click="newTopic" >Envoyer</button>
 </div>
 </div>
@@ -73,7 +72,18 @@ export default {
         text: "",
         files: false,
         submitted: false
-      }
+      },
+        currentTopic: null,
+      currentComments: null,
+      currentCommentsCount:null,
+      loadingTopic: false,
+      loadingComment: false, 
+      postTopic: null,
+      postComment: null,
+      errorTopic: null,
+      errorComment: null,
+      topicId: this.$route.params.id,
+      userId: null
     };
   },
   methods: {
@@ -81,6 +91,34 @@ export default {
     fetchDataddTopic () {
       console.log("page chargé");
     
+    }, fetchDatas (id) {
+       // manage state of errors 
+      this.errorTopic = this.postTopic = null;
+      this.loadingTopic = true;
+       this.errorComment = this.postComment = null;
+      this.loadingComment = true;
+      let getUserAuth = JSON.parse(localStorage.getItem("session")) || false;
+      console.log(getUserAuth[0].userId);
+      let userAuth = getUserAuth[0].userId.slice(16) || false;
+      // Search Data to loading page
+      TopicDataService.get(id)
+      .then( response => {
+          if (response.status == 200){
+              this.currentTopic = response.data;
+              this.userId = userAuth;
+              console.log(this.userId)
+              this.errorTopic = false
+              this.postTopic = true;
+                this.loadingTopic = false;
+          console.log("héllos")}
+          else {
+              this.errorTopic = "Echec de la recupération des données";
+              this.loadingTopic = false;
+          }})
+      .catch(response => {
+          if (response.status != 200){
+      this.errorTopic = "Echec de la recupération des données";
+      this.loadingTopic = false;}});
     },
     filesSelected(e) {
     this.topic.files = e.target.files[0];
@@ -89,8 +127,7 @@ export default {
     output.onload = function() {
       URL.revokeObjectURL(output.src) 
     }
-    
-    },
+    ;},
     newTopic () {
 
      let textData = "";
@@ -141,6 +178,7 @@ export default {
   },
   mounted () {
     this.fetchDataddTopic() 
+    this.fetchDatas(this.$route.params.id);
   }
   }
 </script>
