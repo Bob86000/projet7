@@ -5,7 +5,7 @@
     alt="Logo de l'entreprise Groupomania"
     height="100px"
     width="100px" />
-  <h1 class="navbar-brand text-danger" href="#">Groupomania</h1>
+  <h1 class="navbar-brand" href="#">Groupomania</h1>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -18,11 +18,15 @@
     </ul>
     <form class="form-inline my-2 my-lg-0 ">
       <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Chercher des publications</button>
+      <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Chercher des publications</button>
     </form>
   </nav>
 </header>
 <main class="container home-page">
+    <div class="d-flex">
+      <router-link v-if="authName" :to="{name: 'deleteUser'}" class="col-8 btn btn-outline-danger text-center">Bienvenue {{ authName }}</router-link>
+    <router-link v-if="authName" :to="{name: 'user'}" class="btn btn-outline-danger col-4" :@click="Logout">Se deconnecter </router-link>
+    </div>
     <div class="loading d-flex justify-content-center" v-if="loadingComment">
         <p>Les données sont en cours de récupération</p>
     </div>
@@ -31,7 +35,7 @@
     </div>
     <div v-if="postComment" class="row d-flex justify-content-start ">
     <router-link v-for="comment in comments" :key="comment.id" :to="{name: 'oneTopic', params: {id:comment.topicId}}" class=" col-sm-3 col-xs-12 my-3 btn btn-light" >
-             <article class="d-block border border-secondary btn btn-light" >
+             <article class="d-block border border-primary  btn btn-light" >
                 <div class="d-flex flex-column justify-content-start align-items-center">
                    <img class= "w-100 mainHeader__img" v-if="comment.imageUrl" :src="comment.imageUrl" alt="image des commentaires">
                 <p class="description article__text mainHeader__text mt-2">{{ comment.description}} </p>
@@ -41,7 +45,7 @@
              </router-link>
              </div>
     <div class="row d-flex" >
-      <router-link :to="{name: 'addTopic',}" class="text-center btn btn-success mx-auto my-3" >Ajouter une publication</router-link>
+      <router-link :to="{name: 'addTopic'}" class="text-center btn btn-outline-danger mx-auto my-3" >Ajouter une publication</router-link>
     </div>
     <div class="loading d-flex justify-content-center" v-if="loadingTopic">
         <p>Les données sont en cours de récupération</p>
@@ -53,7 +57,7 @@
 
 <section v-if="postTopic" class="post row text-center">
     <h2 class="col-12 ">Les dernieres publications</h2>
-        <router-link v-for="topic in topics" :key="topic.id" :to="{name: 'oneTopic', params: {id:topic.id}}" class=" col-12 mx-auto my-3 btn btn-dark" >
+        <router-link v-for="topic in topics" :key="topic.id" :to="{name: 'oneTopic', params: {id:topic.id}}" class=" col-12 mx-auto my-3 btn btn-primary" >
              <article class="col-12 mx-auto my-3  " >
                 <div class=" p-3 mb-2 bg-light text-dark d-flex flex-column justify-content-center align-items-center">
                      <h3 class="my-3">{{ topic.title}}</h3>
@@ -62,14 +66,6 @@
                 </div>
                 <div class="d-flex justify-content-between">
                  <p>{{topic.createdAt.replace('T','_').slice(0,10)}}</p>
-                 <div class="d-flex align-items-center justify-content-between">
-                    <p class="my-auto mx-2">{{topic.likes}}</p> 
-                 <img class="heart" src="../assets/miniheart.jpg" alt="Image representant les likes">
-                 </div>
-                 <div class="d-flex align-items-center justify-content-between">
-                    <p class="my-auto mx-2">{{topic.dislikes}}</p>
-                    <img class="heart" src="../assets/miniace.jpg" alt="Image representant les dislikes">
-                 </div>
                  <p>Publiée par {{topic.user.name}}</p>    
                 </div>
                 
@@ -98,7 +94,8 @@ export default {
       postTopic: null,
       postComment: null,
       errorTopic: null,
-      errorComment: null
+      errorComment: null,
+      authName: null
     };
   },
   mounted () {
@@ -111,6 +108,10 @@ export default {
       this.loadingTopic = true;
        this.errorComment = this.postComment = null;
       this.loadingComment = true;
+      let getNameAuth = JSON.parse(localStorage.getItem("session")) || false;
+     console.log(getNameAuth[0].name);
+     let userName = getNameAuth[0].name|| false;
+     this.authName = userName; 
       // Search Data to loading page
       TopicDataService.getAll()
       .then( response => {

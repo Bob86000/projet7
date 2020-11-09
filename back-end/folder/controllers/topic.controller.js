@@ -6,40 +6,11 @@ const fs = require('fs');
 const decrypt = require('../accessory/decrypt-Id');
 
 
-  /*modele requete postman pour .create
-
-  POST http://localhost:8080/api/topics/create
-
-        {"title": "testpostman2",
-        "description": "descriptiontestpostman2",
-        "published": "true",
-        "userId": "2",
-        "text": "2222222"}
-
-        sourceKey: 'name', foreignKey: 'userName'
-        
-      */
-
 // Create and Save a new Topic
 
 exports.create = (req, res) => {
 
- /* console.log(req.file.filename);
-  console.log(req.file);
-  console.log(req.body);
-    const sauceObject = req.body.sauce;
-    delete sauceObject._id;
-    const sauce = new Sauce({
-      ...sauceObject, //title: req.body.title copie les champs qu'il y a dans la body de la requete et va detaillé les propriétés objets
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-      likes: 0,
-      dislikes: 0,
-      usersLiked : [], //modifier la syntaxe par usersLikes et toute les occurences
-      usersDisliked: []
-    });*/
-    // Validate request
-    // un champs userId supplémentaire doit etre apporté dans la requete
-   console.log(decrypt.decryptId);
+ 
    //const actualId = decrypt.decryptId(req.body.topic.userId); 
    const textObject = JSON.parse(req.body.topic);
    const actualId = decrypt.decryptId(textObject.userId); 
@@ -71,16 +42,6 @@ exports.create = (req, res) => {
 };
 
 
-/* modele requete postman pour .modifyTopicsLike
-{
-  put http://localhost:8080/api/topics/create/1
-
-  {"userId": 1,
-  "like": 1}
-}
-
-
-*/
 exports.modifyTopicsLikes = (req, res) => {
 
       Topic.findOne(({ where: { id: req.params.id} }))
@@ -174,12 +135,6 @@ exports.modifyTopicsLikes = (req, res) => {
 
 
 
-/* modele requete postman pour .findAll
-{
-  get http://localhost:8080/api/topics/all
-
-}*/
-
 // Retrieve all Topics from the database.
 
 exports.findAllTitleTopic = (req, res) => {
@@ -200,15 +155,11 @@ exports.findAllTitleTopic = (req, res) => {
       });
   };
 
-/* modele requete postman pour .findAll
-{
-  get http://localhost:8080/api/topics/alltop
 
-}*/
 
   exports.findAllTopic = (req, res) => {
   
-    //Topic.findAll({order : [ ['id', 'DESC'] ]})
+
     Topic.findAll({ include: User, order : [ ['id', 'DESC'] ]})
       .then(data => {
       return  res.send(data);
@@ -223,7 +174,7 @@ exports.findAllTitleTopic = (req, res) => {
 
   exports.findAllTopTopic = (req, res) => {
   
-    //Topic.findAll({order : [ ['likes', 'DESC'] ]})
+  
     Topic.findAll({ include: User, order : [ ['likes', 'DESC'] ]})
       .then(data => {
         console.log(data);
@@ -236,11 +187,6 @@ exports.findAllTitleTopic = (req, res) => {
         });
       });
   };
-/* modele requete postman pour .findOne
-{
-  get http://localhost:8080/api/topics/1
-
-}*/
 
 // Find a single Topic with an id
 exports.findOne = (req, res) => {
@@ -261,14 +207,7 @@ exports.findOne = (req, res) => {
 
 // Update a Topic by the id in the request
 exports.updatefile = (req, res) => {
-// Verify if origin request come from topic OP
- /* if (req.auth.id != data.userId) {
-    return res.status(400).send({
-      message: "Vous n'êtes pas l'auteur de la publication"
-    });
-  }*/
-   // un champs userId supplémentaire doit etre apporté dans la requete
-   //const actualId = decrypt.decryptId(req.body.topic.userId); 
+
    const textObject = JSON.parse(req.body.topic);
    const topicId = req.params.id
    const actualId = decrypt.decryptId(textObject.userId); 
@@ -310,12 +249,7 @@ exports.updatefile = (req, res) => {
 
 
   exports.update = (req, res) => {
-    // Verify if origin request come from topic OP
-     /* if (req.auth.id != data.userId) {
-        return res.status(400).send({
-          message: "Vous n'êtes pas l'auteur de la publication"
-        });
-      }*/
+    
        const id = req.params.id;
        if (id == null) {
         return res.status(500).send({ message : "erreur lors de la requete"})
@@ -360,7 +294,7 @@ exports.delete = (req, res) => {
         Topic.destroy({
           where: { id: topicId }
         })
-          .then(res => {
+          .then(response => {
            return res.status(201).send({ message: "objet supprimé !" });
           })
           .catch(err => {

@@ -7,13 +7,7 @@ const decrypt = require('../accessory/decrypt-Id');
 
 // Create and Save a new Comment
 exports.create = (req, res) => {
-    // Validate request
-    /*if (!req.body.description) {
-      res.status(400).send({
-        message: "can not be empty!"
-      });
-      return;
-    }*/
+
       // un champs userId supplémentaire doit etre apporté dans la requete
       console.log(decrypt.decryptId);
       console.log(req.body.comment);
@@ -38,18 +32,6 @@ exports.create = (req, res) => {
       usersLiked : "",
       usersDisliked: "" 
       };
-      console.log(comment);
-
-      /* test requete postman 
-      post  http://localhost:8080/api/comments/create
-      
-      {"description": "tesstcommentpostman1",
-        "imageUrl": "testcommentpostman1",
-        "published": "true",
-        "userId": "2",
-        "topicId": "2"}
-        
-        */
 
     // Save Tutorial in the database
     Comment.create(comment)
@@ -64,17 +46,6 @@ exports.create = (req, res) => {
   });
 };
 
-
-/* modele requete postman
-{
-  put http://localhost:8080/api/comments/create/2
-
-  {"userId": "1",
-  "like": "1"}
-}
-
-
-*/
 exports.modifyCommentsLikes = (req, res) => {
 
   Comment.findOne(({ where: { id: req.params.id} }))
@@ -171,12 +142,6 @@ exports.modifyCommentsLikes = (req, res) => {
   }
 
 
-/* modele requete postman pour .findAll
-{
-  get http://localhost:8080/api/comments/all
-
-}*/
-
 // Retrieve all Tutorials from the database.
 
 exports.findAll = (req, res) => {
@@ -212,15 +177,10 @@ exports.findAll = (req, res) => {
       });
   };
 
-/* modele requete postman pour .findOne
-{
-  get http://localhost:8080/api/comments/1
-
-}*/
-
 // Find a single Topic with an id
 exports.findOne = (req, res) => {
   const id = req.params.id;
+  console.log(id);
 
   Comment.findByPk(id)
     .then(data => {
@@ -235,14 +195,7 @@ exports.findOne = (req, res) => {
     });
 };
 exports.updatefile = (req, res) => {
-  // Verify if origin request come from topic OP
-   /* if (req.auth.id != data.userId) {
-      return res.status(400).send({
-        message: "Vous n'êtes pas l'auteur de la publication"
-      });
-    }*/console.log("hrllo");
-     // un champs userId supplémentaire doit etre apporté dans la requete
-     //const actualId = decrypt.decryptId(req.body.topic.userId); 
+  
      const commentObject = JSON.parse(req.body.comment);
      const commentId = req.params.id;
      const actualId = decrypt.decryptId(commentObject.userId); 
@@ -326,7 +279,7 @@ exports.delete = (req, res) => {
         Comment.destroy({
           where: { id: data.id}
         })
-          .then(res => {
+          .then(response => {
           return  res.status(201).send({ message: "objet supprimé !" });
           })
           .catch(err => {
@@ -362,12 +315,6 @@ exports.findAllPublished = (req, res) => {
         });
       });
   };
-
-/* modele requete postman pour .countAllcomment
-{
-  get http://localhost:8080/api/comments/count/1
-
-}*/
 
 
  exports.countAllcomment = (req, res) => {

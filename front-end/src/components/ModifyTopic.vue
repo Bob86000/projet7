@@ -147,6 +147,7 @@ export default {
      TopicDataService.updatefile(this.topicId ,formData)
         .then(response => {
           this.topic.id = response.data.id;
+          this.$router.push({name: 'home'});
           console.log(response.data);
         })
         .catch(e => {
@@ -161,6 +162,7 @@ export default {
         TopicDataService.update(this.topicId, formData)
         .then(response => {
           this.topic.id = response.data.id;
+          this.$router.push({name: 'home'});
           console.log(response.data);
         })
         .catch(e => {

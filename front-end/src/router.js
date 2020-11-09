@@ -17,6 +17,11 @@ export const router = new Router({
       component: () => import("./components/Home")
     },
     {
+      path: "/deleteUser",
+      name: "deleteUser",
+        component: () => import("./components/deleteUser")
+      },
+    {
       path: "/bestTopic",
       name: "bestTopic",
         component: () => import("./components/BestTopic")
@@ -32,12 +37,7 @@ export const router = new Router({
       component: () => import("./components/ModifyTopic")
     },
     {
-      path: "/comment/:id",
-      name: "oneComment",
-      component: () => import("./components/Comment")
-    },
-    {
-      path: "/comment/modify/:id",
+      path: "/comment/modify/:commentId",
       name: "modifyComment",
       component: () => import("./components/ModifyComment")
     },

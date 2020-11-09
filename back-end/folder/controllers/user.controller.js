@@ -1,22 +1,13 @@
 const bcrypt = require('bcrypt');
 var validator = require('validator');
 const jwt = require('jsonwebtoken');
+const decrypt = require('../accessory/decrypt-Id');
 
 const db = require("../models");
 const User = db.users;
 const Op = db.Sequelize.Op;
 
-/* modele requete pour postman
-post http://localhost:8080/api/users/signup
 
-{ "email": "23f@gmail.com",
-"password": "1234"}
-
-{ "email": "46@gmail.com",
-"password": "14"}
-
-
-*/
 // Create and Save a new user
 exports.signup = (req, res) => {
     if (!req.body.email||!req.body.password||!req.body.name) {
@@ -34,7 +25,8 @@ exports.signup = (req, res) => {
       const user = {
           name: req.body.name,
           email: req.body.email,
-          password: hash
+          password: hash,
+          admin: false
       };
       console.log(user);
       // Save user in the database
@@ -87,7 +79,8 @@ exports.login = (req, res) => {
 
               return res.status(200).json({
                 userId: userSalt,
-                token: tokenSalt
+                token: tokenSalt,
+                name: user.name
               });
             })
             .catch(error => res.status(500).json({ error }));
@@ -100,17 +93,12 @@ exports.login = (req, res) => {
       });
   };
 
-  /* modele requete pour postman
-DELETE http://localhost:8080/api/users/1
-
-{ "email": "23@gmail.com",
-"password": "1234"}*/
 
   exports.delete = (req, res) => {
-    const id = req.params.id;
+    const actualId= decrypt.decryptId(req.query.userId)
   
     User.destroy({
-      where: { id: id }
+      where: { id: actualId }
     })
       .then(() => {
         res.status(201).json({ message: "objet supprimé !" });

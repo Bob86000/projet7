@@ -60,7 +60,7 @@ export default {
       },
       loadingComment: false, 
       errorComment: null,
-      currentCommentsId: this.$route.params.id,
+      currentCommentsId: this.$route.params.commentId,
       userId: null
     };
   },
@@ -118,6 +118,7 @@ export default {
     CommentDataService.updatefile(this.currentCommentsId ,formData)
         .then(response => {
           this.currentComments.id = response.data.id;
+          this.$router.push({name: 'home'});
           console.log(response.data);
         })
         .catch(e => {
@@ -132,6 +133,7 @@ export default {
         CommentDataService.update(this.currentCommentsId, formData)
         .then(response => {
           this.currentComments.id = response.data.id;
+          this.$router.push({name: 'home'});
           console.log(response.data);
         })
         .catch(e => {
@@ -149,7 +151,7 @@ export default {
   },
   mounted () {
     this.fetchDataddTopic() 
-    this.fetchDatas(this.$route.params.id);
+    this.fetchDatas(this.$route.params.commentId);
   }
   }
 </script>

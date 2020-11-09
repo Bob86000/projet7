@@ -77,7 +77,7 @@
                  <p>Publiée par {{currentComment.user.name}}</p>    
                 </div>
                 <button v-if="userId==currentComment.userId" :id="'deleteComment'+currentComment.id" class="text-center btn btn-danger mx-auto my-3" @click="deleteComment" >Supprimer la publication</button>
-                <router-link v-if="userId==currentComment.userId" :to="{name: 'modifyComment', params: { topicId: currentComment.id}}" class="text-center btn btn-success mx-auto my-3" >Modifier le commentaire</router-link>
+                <router-link v-if="userId==currentComment.userId" :to="{name: 'modifyComment', params: { commentId: currentComment.id}}" class="text-center btn btn-success mx-auto my-3" >Modifier le commentaire</router-link>
                 </div>
                 
                  </aside>
@@ -168,7 +168,8 @@ export default {
       console.log (deleteCommentId);
       CommentDataService.delete(deleteCommentId, needAuth)
       .then( response => {
-       if ( response.status == 505 ){
+       if ( response.status == 201 ){
+                this.$router.push({name: 'home'});
                 return console.log("suppression du commentaire réussi");
               }
         else {
@@ -183,7 +184,7 @@ deleteTopic() {
       console.log (deleteTopicId);
       TopicDataService.delete(deleteTopicId, needAuth)
       .then( response => {
-       if (response.status == 201 || response.status == 505 ){
+       if (response.status == 201){
                 console.log("suppression de la publication réussi");
                 this.$router.push({name: 'home'});
               }
