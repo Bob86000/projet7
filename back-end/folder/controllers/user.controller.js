@@ -24,7 +24,7 @@ exports.signup = (req, res) => {
           message: "Les champs ne sont remplis!"
         });
       }
-    else if( req.body.email.length < 3)
+    else if( req.body.password.length < 4)
     { return res.status(400).send({ message : "mot de passe trop court"})}
     else if (validator.isEmail(req.body.email)) {
       console.log(req.body.name);

@@ -1,5 +1,6 @@
 const db = require("../models");
 const Comment = db.comments;
+const User = db.users;
 const Op = db.Sequelize.Op;
 const fs = require('fs');
 const decrypt = require('../accessory/decrypt-Id');
@@ -42,7 +43,7 @@ exports.create = (req, res) => {
       /* test requete postman 
       post  http://localhost:8080/api/comments/create
       
-      {"description": "testcommentpostman1",
+      {"description": "tesstcommentpostman1",
         "imageUrl": "testcommentpostman1",
         "published": "true",
         "userId": "2",
@@ -199,7 +200,7 @@ exports.findAll = (req, res) => {
 
   exports.findTopComment = (req, res) => {
   
-    Comment.findAll({order : [ ['likes', 'DESC'] ]},{limit: 4})
+    Comment.findAll({order : [ ['likes', 'DESC'] ], limit: 4})
       .then(data => {
       return  res.send(data);
       })
@@ -261,19 +262,41 @@ exports.Commentupdate = (req, res) => {
 
 // Delete a Tutorial with the specified id in the request
 exports.delete = (req, res) => {
-    const id = req.params.id;
-  
-    Comment.destroy({
-      where: { id: id }
+
+  const responseObject = JSON.parse(req.body);
+   const actualId = decrypt.decryptId(responseObject.userId); 
+  responseObject.userId = actualId;
+  const commentId = responseObject.id
+
+    Comment.findByPk(commentId)
+    .then(data => {
+      if (data === null) { return res.status(500).send({ message: "cette page n'existe pas"})}
+      
+      if ( data.userId == actualId) {
+
+        Comment.destroy({
+          where: { id: id }
+        })
+          .then(() => {
+          return  res.status(201).json({ message: "objet supprimé !" });
+          })
+          .catch(err => {
+            return  res.status(500).send({
+              message: "Could not delete Comment with id=" + id
+            });
+          });
+
+      }
+       return res.status(500).json({ message: "problème d'authentification !" })
+    
     })
-      .then(() => {
-      return  res.status(201).json({ message: "objet supprimé !" });
-      })
-      .catch(err => {
-        return  res.status(500).send({
-          message: "Could not delete Tutorial with id=" + id
-        });
+    .catch(err => {
+    return  res.status(500).send({
+        message: "Erreur lors de la recherche de la publication avec un id = " + id
       });
+    });
+  
+    
   };
 
 
@@ -301,7 +324,7 @@ exports.findAllPublished = (req, res) => {
  exports.countAllcomment = (req, res) => {
     const topicId = req.params.id;
     console.log(topicId);
-    Comment.findAndCountAll({ where: { topicId: {[Op.like]:topicId }}})
+    Comment.findAndCountAll({ include: User, where: { topicId: {[Op.like]:topicId }}})
       .then(data => {
         let newData = {}
         newData.rows = data.rows;

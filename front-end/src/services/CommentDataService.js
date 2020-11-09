@@ -37,8 +37,8 @@ class CommentDataService {
     return http.put(`/comments/${id}`, data);
   }
 
-  delete(id) {
-    return http.delete(`/comments/${id}`);
+  delete(id, data) {
+    return http.delete(`/comments/${id}`, data);
   }
 
   deleteAll() {

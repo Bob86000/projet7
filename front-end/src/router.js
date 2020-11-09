@@ -3,7 +3,7 @@ import Router from "vue-router";
 
 Vue.use(Router);
 
-export default new Router({
+export const router = new Router({
   mode: "history",
   routes: [
     {
@@ -41,11 +41,24 @@ export default new Router({
       name: "addComment",
       component: () => import("./components/AddComment")
     },
-    
     {
       path: "*",
       redirect: '/'
     }
 
   ]
+});
+
+router.beforeEach((to, from, next) => {
+  const publicPages = ['/'];
+  const authRequired = !publicPages.includes(to.path);
+  const loggedIn = localStorage.getItem('session');
+
+  // trying to access a restricted page + not logged in
+  // redirect to login page
+  if (authRequired && !loggedIn) {
+    next('/login');
+  } else {
+    next();
+  }
 });

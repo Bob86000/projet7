@@ -15,9 +15,6 @@
       <li class="nav-item active">
         <router-link class="nav-link btn btn-light" :to="{name:'bestTopic'}">Les publications populaires<span class="sr-only">(current)</span></router-link>
       </li>
-      <li class="nav-item active">
-        <router-link class="nav-link btn btn-light" :to="{name: 'home'}">Les commentaires</router-link>
-      </li>
     </ul>
     <form class="form-inline my-2 my-lg-0 ">
       <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
@@ -25,19 +22,19 @@
     </form>
   </nav>
 </header>
-<main class="container">
+<main class="container home-page">
     <div class="loading d-flex justify-content-center" v-if="loadingComment">
         <p>Les données sont en cours de récupération</p>
     </div>
     <div v-if="errorComment" class="error">
       {{ errorComment }}
     </div>
-    <div v-if="postComment" class="row d-flex justify-content-around ">
-    <router-link v-for="comment in comments" :key="comment.id" :to="{name: 'oneTopic', params: {id:comment.topicId}}" class=" col-sm-3 col-xs-12 my-3 btn btn-light " >
-             <article class="d-block border border-secondary btn btn-light h-100" >
-                <div class="d-flex flex-column justify-content-center align-items-center">
-                    <img class= "mainHeader__img" v-if="comment.imageUrl" :src="comment.imageUrl" alt="">
-                <p class="description article__text">{{ comment.description}} </p>
+    <div v-if="postComment" class="row d-flex justify-content-start ">
+    <router-link v-for="comment in comments" :key="comment.id" :to="{name: 'oneTopic', params: {id:comment.topicId}}" class=" col-sm-3 col-xs-12 my-3 btn btn-light" >
+             <article class="d-block border border-secondary btn btn-light" >
+                <div class="d-flex flex-column justify-content-start align-items-center">
+                   <img class= "w-100 mainHeader__img" v-if="comment.imageUrl" :src="comment.imageUrl" alt="image des commentaires">
+                <p class="description article__text mainHeader__text mt-2">{{ comment.description}} </p>
                 </div>
              <p>Commenté par {{comment.userId}}</p>       
              </article>
@@ -162,10 +159,18 @@ export default {
 html {
   font-size: 1rem;
 }
-.mainHeader__img {
-  width: 80%;
+.article-comment{
+  height: 300px;
 }
-section img {
+.home-page p{
+  overflow: hidden;
+  white-space: nowrap;
+   text-overflow: ellipsis;
+}
+.mainHeader__img {
+   height: 150px;
+}
+.home-page section img {
   width:80%;
 }
 .article__text{
@@ -173,6 +178,11 @@ section img {
   background-color: rgba(163, 211, 122, 0.404);
   border: 1px solid rgb(66, 206, 11);
 }
+.heart { 
+    width:37px;
+    height: 37px;
+    border-radius: 100px; }
+
 @media all and (max-width: 575.98px){
   html {
     font-size: 0.7rem;
@@ -190,9 +200,9 @@ section img {
   .description {
     font-size: 0.8rem;
   }
+  .mainHeader__img {
+   height: 300px;
 }
-.heart { 
-    width:37px;
-    height: 37px;
-    border-radius: 100px; }
+}
+
 </style>

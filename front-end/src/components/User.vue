@@ -63,7 +63,7 @@
       <router-link v-else :to="{name: 'home'}" class=" btn btn-success mx-auto my-3" >Valider</router-link>
     </div>
       <div v-if="alert" class="alert alert-success" role="alert">
-        Une erreur est survenue, vérifier vos informations
+        Une erreur est survenue, vérifier vos informations 
       </div>
 
     </div>

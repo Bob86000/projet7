@@ -22,7 +22,7 @@
     </form>
   </nav>
 </header>
-<main class="container">
+<main class="container bestTopic-page">
     <div class="loading d-flex justify-content-center" v-if="loadingTopic">
         <p>Les données sont en cours de récupération</p>
     </div>
@@ -135,10 +135,10 @@ export default {
 html {
   font-size: 1rem;
 }
-section img {
+.bestTopic-page section img {
   width:80%;
 }
-.article__text{
+.bestTopic-page .article__text{
   width: 80%;
   background-color: rgba(163, 211, 122, 0.404);
   border: 1px solid rgb(66, 206, 11);
@@ -152,16 +152,16 @@ section img {
   html {
     font-size: 0.9rem;
   }
-  .description {
+  .bestTopic-page .description {
     font-size: 0.6rem;
   }
 }
 @media all and (min-width: 768px) and (max-width: 1200px){
-  .description {
+  .bestTopic-page .description {
     font-size: 0.8rem;
   }
 }
-.heart {
+.bestTopic-page .heart {
      width:37px;
     height: 37px;
     border-radius: 100px; }

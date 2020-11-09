@@ -42,12 +42,13 @@ db.topics.hasOne(db.comments, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
-db.users.hasOne(db.comments, {
+db.users.hasMany(db.comments, {
   foreignKey: {
   allowNull: false
 },
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
+db.comments.belongsTo(db.users);
 
 module.exports = db;
